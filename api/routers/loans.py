@@ -275,14 +275,14 @@ def customer_apply_loan(
         status="APPLICATION",
         schedule_json=[
             {
-                "instalment_number": i.instalment_number,
-                "due_date": i.due_date,
-                "principal": str(i.principal),
-                "interest": str(i.interest),
-                "total": str(i.total),
-                "balance_after": str(i.balance_after),
+                "instalment_number": i.period,
+                "due_date": i.due_date.isoformat(),
+                "principal": str(i.principal_component),
+                "interest": str(i.interest_component),
+                "total": str(i.total_payment),
+                "balance_after": str(i.closing_balance),
             }
-            for i in result.schedule
+            for i in result.instalments
         ],
     )
     db.add(loan)
@@ -330,14 +330,14 @@ def get_quote(
         apr=Decimal(str(result.apr_pct)).quantize(Decimal("0.0001")) if result.apr_pct else Decimal("0"),
         schedule=[
             LoanScheduleInstalment(
-                instalment_number=i.instalment_number,
-                due_date=i.due_date,
-                principal=i.principal,
-                interest=i.interest,
-                total=i.total,
-                balance_after=i.balance_after,
+                instalment_number=i.period,
+                due_date=i.due_date.isoformat(),
+                principal=i.principal_component,
+                interest=i.interest_component,
+                total=i.total_payment,
+                balance_after=i.closing_balance,
             )
-            for i in result.schedule
+            for i in result.instalments
         ],
     )
 
@@ -391,14 +391,14 @@ def apply_for_loan(
         status="APPLICATION",
         schedule_json=[
             {
-                "instalment_number": i.instalment_number,
-                "due_date": i.due_date,
-                "principal": str(i.principal),
-                "interest": str(i.interest),
-                "total": str(i.total),
-                "balance_after": str(i.balance_after),
+                "instalment_number": i.period,
+                "due_date": i.due_date.isoformat(),
+                "principal": str(i.principal_component),
+                "interest": str(i.interest_component),
+                "total": str(i.total_payment),
+                "balance_after": str(i.closing_balance),
             }
-            for i in result.schedule
+            for i in result.instalments
         ],
     )
     db.add(loan)
