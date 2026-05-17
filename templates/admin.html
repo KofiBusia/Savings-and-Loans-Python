@@ -1206,21 +1206,76 @@ async function loadAdminLoans() {
   try {
     const loans = await api('GET', url);
     document.getElementById('adLoanTable').innerHTML = buildTable(
-      ['Loan #','Customer','Principal','Tenure','Status','Outstanding','Disbursed','Next Due'],
-      (loans||[]).map(l => [
-        `<code class="small">${l.loan_number}</code>`,
-        l.customer_id?.slice(0,8)+'…',
-        fmt(l.principal_ghs),
-        `${l.tenure_months}m`,
-        badge(l.status),
-        fmt(l.outstanding_ghs),
-        l.disbursed_at ? fmtD(l.disbursed_at) : '—',
-        l.next_due_date ? fmtD(l.next_due_date) : '—'
-      ])
+      ['Loan #','Customer','Principal','Tenure','Status','Outstanding','Disbursed','Actions'],
+      (loans||[]).map(l => {
+        let actions = '—';
+        if (['APPLICATION','CREDIT_CHECK','DOCUMENT_COLLECTION','CREDIT_COMMITTEE'].includes(l.status)) {
+          actions = `
+            <button class="btn btn-xs btn-success me-1" onclick="approveLoan('${l.id}','${l.loan_number}')">
+              <i class="bi bi-check-lg"></i> Approve
+            </button>
+            <button class="btn btn-xs btn-danger" onclick="rejectLoan('${l.id}','${l.loan_number}')">
+              <i class="bi bi-x-lg"></i> Reject
+            </button>`;
+        } else if (l.status === 'APPROVED') {
+          actions = `
+            <button class="btn btn-xs btn-warning" onclick="disburseLoan('${l.id}','${l.loan_number}','${l.principal_ghs}')">
+              <i class="bi bi-send"></i> Disburse
+            </button>`;
+        }
+        return [
+          `<code class="small">${l.loan_number}</code>`,
+          l.customer_id?.slice(0,8)+'…',
+          fmt(l.principal_ghs),
+          `${l.tenure_months}m`,
+          badge(l.status),
+          fmt(l.outstanding_ghs),
+          l.disbursed_at ? fmtD(l.disbursed_at) : '—',
+          actions
+        ];
+      })
     );
     if (!(loans||[]).length) document.getElementById('adLoanTable').innerHTML =
       '<div class="text-center py-4" style="color:var(--grey);">No loans found</div>';
   } catch (err) { toast(err.message, 'danger'); }
+}
+
+async function approveLoan(loanId, loanNumber) {
+  const notes = prompt(`Approve loan ${loanNumber}?\n\nOptional notes (leave blank to confirm):`);
+  if (notes === null) return;
+  try {
+    await api('POST', `/loans/${loanId}/approve`, { approved: true, notes: notes || null });
+    toast(`Loan ${loanNumber} approved. Customer has a 5-day cooling-off period.`, 'success');
+    await loadAdminLoans();
+  } catch (err) { toast('Approve failed: ' + err.message, 'danger'); }
+}
+
+async function rejectLoan(loanId, loanNumber) {
+  const reason = prompt(`Reject loan ${loanNumber}?\n\nRejection reason (required):`);
+  if (!reason) { toast('A rejection reason is required.', 'warning'); return; }
+  try {
+    await api('POST', `/loans/${loanId}/approve`, { approved: false, rejection_reason: reason });
+    toast(`Loan ${loanNumber} rejected.`, 'warning');
+    await loadAdminLoans();
+  } catch (err) { toast('Reject failed: ' + err.message, 'danger'); }
+}
+
+async function disburseLoan(loanId, loanNumber, principal) {
+  const account = prompt(`Disburse loan ${loanNumber} (GHS ${parseFloat(principal).toFixed(2)})?\n\nEnter disbursement MoMo / bank account number:`);
+  if (account === null) return;
+  if (!account.trim()) { toast('Account number is required.', 'warning'); return; }
+  const channel = prompt('Disbursement channel (GHIPSS / MOBILE_MONEY / BANK_TRANSFER):') || 'GHIPSS';
+  const ok = confirm(`Confirm IRREVERSIBLE disbursement of GHS ${parseFloat(principal).toFixed(2)} to "${account.trim()}" via ${channel}?`);
+  if (!ok) return;
+  try {
+    await api('POST', `/loans/${loanId}/disburse`, {
+      disbursement_account: account.trim(),
+      disbursement_channel: channel.toUpperCase(),
+      confirm: true
+    });
+    toast(`Loan ${loanNumber} disbursed — savings account credited.`, 'success');
+    await loadAdminLoans();
+  } catch (err) { toast('Disburse failed: ' + err.message, 'danger'); }
 }
 
 // ── Compliance ────────────────────────────────────────────────────────────────

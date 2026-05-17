@@ -524,14 +524,41 @@ def disburse_loan(
     loan.disbursement_account = body.disbursement_account
     loan.disbursement_channel = body.disbursement_channel
 
-    # TODO: call GhIPSS MMI disbursement via asyncio.run in background task
-
     db.commit()
+
+    # Credit the customer's active savings account with the disbursed principal
+    savings_account = (
+        db.query(models.SavingsAccount)
+        .filter_by(customer_id=loan.customer_id, status="ACTIVE")
+        .first()
+    )
+    if savings_account:
+        balance_before = savings_account.balance
+        savings_account.balance += loan.principal_ghs
+        savings_account.last_transaction_at = now
+        disbursement_txn = models.SavingsTransaction(
+            account_id=savings_account.id,
+            reference=generate_reference(),
+            type="LOAN_DISBURSEMENT",
+            amount=loan.principal_ghs,
+            balance_before=balance_before,
+            balance_after=savings_account.balance,
+            channel=body.disbursement_channel,
+            narration=f"Loan disbursement — {loan.loan_number}",
+            processed_by=current_user.id,
+            status="CONFIRMED",
+        )
+        db.add(disbursement_txn)
+        db.commit()
+        log.info("loan_disbursement_credited account_id=%s amount=%s loan=%s",
+                 savings_account.id, loan.principal_ghs, loan.loan_number)
+
     write_audit(db, table_name="loans", record_id=loan.id, action="DISBURSE",
                 actor_id=current_user.id, data={
                     "loan_number": loan.loan_number,
                     "channel": body.disbursement_channel,
                     "account": body.disbursement_account,
+                    "savings_credited": savings_account.id if savings_account else None,
                 })
 
     return loan
