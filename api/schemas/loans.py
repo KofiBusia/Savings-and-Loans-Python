@@ -23,6 +23,10 @@ class LoanProductCreate(BaseModel):
     requires_guarantor: bool = False
     eligible_customer_types: list[str] = ["INDIVIDUAL"]
     minimum_kyc_status: str = "ACTIVE"
+    savings_ratio: Decimal = Field(default=Decimal("0.70"), gt=0, le=Decimal("1.0"),
+        description="Max loan as fraction of savings balance. 0.70 = 70%")
+    collateral_ratio: Decimal = Field(default=Decimal("0.50"), gt=0, le=Decimal("1.0"),
+        description="Max loan as fraction of collateral value. 0.50 = 50%")
 
 
 class LoanProductResponse(BaseModel):
@@ -36,6 +40,8 @@ class LoanProductResponse(BaseModel):
     max_tenure_months: int
     requires_collateral: bool
     is_active: bool
+    savings_ratio: Decimal
+    collateral_ratio: Decimal
 
     model_config = {"from_attributes": True}
 
@@ -149,3 +155,16 @@ class LoanListParams(BaseModel):
     overdue_only: bool = False
     page: int = Field(default=1, ge=1)
     page_size: int = Field(default=20, ge=1, le=100)
+
+
+class LoanEligibilityResponse(BaseModel):
+    savings_balance: Decimal
+    savings_ratio: Decimal
+    max_savings_loan: Decimal
+    collateral_value_ghs: Decimal
+    collateral_ratio: Decimal
+    max_collateral_loan: Decimal
+    effective_max: Decimal
+    product_max: Decimal | None
+    final_max: Decimal | None
+    note: str

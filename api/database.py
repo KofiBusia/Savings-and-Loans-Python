@@ -19,12 +19,15 @@ class Base(DeclarativeBase):
     pass
 
 
+_is_sqlite = settings.database_url.startswith("sqlite")
 engine = create_engine(
     settings.database_url,
-    pool_size=settings.db_pool_size,
-    max_overflow=settings.db_max_overflow,
-    pool_timeout=settings.db_pool_timeout,
-    pool_pre_ping=True,         # detect stale connections
+    **({} if _is_sqlite else {
+        "pool_size": settings.db_pool_size,
+        "max_overflow": settings.db_max_overflow,
+        "pool_timeout": settings.db_pool_timeout,
+    }),
+    pool_pre_ping=not _is_sqlite,
     echo=settings.node_env == "development",
 )
 
@@ -49,7 +52,27 @@ def init_db() -> None:
     """Create all tables if they don't exist (idempotent)."""
     import api.models  # noqa: F401 — ensure models are registered on Base
     Base.metadata.create_all(bind=engine)
+    _migrate_columns()
     log.info("database tables verified/created")
+
+
+def _migrate_columns() -> None:
+    """Add new columns to existing tables without dropping data (SQLite-safe)."""
+    _migrations = [
+        ("customers", "savings_product_id", "VARCHAR(36)"),
+        ("loan_products", "savings_ratio", "NUMERIC(5,4) DEFAULT 0.7000"),
+        ("loan_products", "collateral_ratio", "NUMERIC(5,4) DEFAULT 0.5000"),
+        ("customers", "assigned_officer_id", "VARCHAR(36)"),
+    ]
+    with engine.connect() as conn:
+        for table, col, col_type in _migrations:
+            try:
+                result = conn.execute(text(f"SELECT {col} FROM {table} LIMIT 1"))
+                result.close()
+            except Exception:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+                conn.commit()
+                log.info("migrated: added %s.%s", table, col)
 
 
 def get_db():

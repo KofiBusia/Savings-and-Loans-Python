@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ghana Savings &amp; Loans — Secure Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <style>
+    body { background: var(--dark); }
+  </style>
+</head>
+<body class="login-page-body">
+
+<!-- Ticker Bar -->
+<div class="ticker-bar">
+  <div class="ticker-label">BOG &amp; FX</div>
+  <div class="ticker-track">
+    <div class="ticker-inner">
+      <span class="tick-item"><span class="tick-sym">BOG POLICY RATE</span><span class="tick-val tick-nc">28.0%</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">USD / GHS</span><span class="tick-val tick-dn">15.30</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">EUR / GHS</span><span class="tick-val tick-dn">16.48</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">GBP / GHS</span><span class="tick-val tick-dn">19.42</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">BoG MFI LICENSED</span><span class="tick-val tick-nc">Act 930</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AML COMPLIANCE</span><span class="tick-val tick-nc">Act 1044</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DATA RESIDENCY</span><span class="tick-val tick-nc">Act 843</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">CREDIT REPORTING</span><span class="tick-val tick-nc">Regs 2020</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">CYBERSECURITY</span><span class="tick-val tick-nc">Act 1038</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DCD</span><span class="tick-val tick-nc">2025 COMPLIANT</span></span>
+      <span class="tick-divider">·</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="tick-item"><span class="tick-sym">BOG POLICY RATE</span><span class="tick-val tick-nc">28.0%</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">USD / GHS</span><span class="tick-val tick-dn">15.30</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">EUR / GHS</span><span class="tick-val tick-dn">16.48</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">GBP / GHS</span><span class="tick-val tick-dn">19.42</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">BoG MFI LICENSED</span><span class="tick-val tick-nc">Act 930</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AML COMPLIANCE</span><span class="tick-val tick-nc">Act 1044</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DATA RESIDENCY</span><span class="tick-val tick-nc">Act 843</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">CREDIT REPORTING</span><span class="tick-val tick-nc">Regs 2020</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">CYBERSECURITY</span><span class="tick-val tick-nc">Act 1038</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DCD</span><span class="tick-val tick-nc">2025 COMPLIANT</span></span>
+      <span class="tick-divider">·</span>
+    </div>
+  </div>
+</div>
+
+<!-- Login Layout -->
+<div class="login-wrapper">
+
+  <!-- ── Left: Hero Panel ── -->
+  <div class="login-hero">
+    <!-- Brand -->
+    <div class="login-hero-brand">
+      <div class="login-hero-logo">
+        <i class="bi bi-bank2"></i>
+      </div>
+      <span class="hero-tag">BoG Licensed Microfinance Institution</span>
+      <h1>Ghana Savings<br>&amp; Loans Ltd.</h1>
+      <p>A fully regulated microfinance institution empowering Ghanaian individuals and businesses through accessible savings products and fair credit — all within a secure, compliance-first digital platform.</p>
+    </div>
+
+    <!-- Feature highlights -->
+    <div class="hero-features">
+      <div class="hero-feature-item">
+        <div class="hero-feature-icon"><i class="bi bi-piggy-bank"></i></div>
+        <div>
+          <h6>Interest-Bearing Savings</h6>
+          <p>Competitive rates on your deposits, credited automatically to your account.</p>
+        </div>
+      </div>
+      <div class="hero-feature-item">
+        <div class="hero-feature-icon"><i class="bi bi-cash-coin"></i></div>
+        <div>
+          <h6>Fast Loan Processing</h6>
+          <p>Apply for personal or business loans and track approval status in real time.</p>
+        </div>
+      </div>
+      <div class="hero-feature-item">
+        <div class="hero-feature-icon"><i class="bi bi-phone"></i></div>
+        <div>
+          <h6>Mobile Money Integration</h6>
+          <p>Deposit and withdraw instantly via MTN MoMo, Telecel Cash, and AirtelTigo.</p>
+        </div>
+      </div>
+      <div class="hero-feature-item">
+        <div class="hero-feature-icon"><i class="bi bi-shield-lock"></i></div>
+        <div>
+          <h6>Bank-Grade Security</h6>
+          <p>MFA-protected, audit-logged, and AML-compliant with immutable transaction records.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compliance footer -->
+    <div>
+      <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--grey);margin-bottom:0.6rem;">Regulatory Compliance</div>
+      <div class="hero-compliance">
+        <span class="compliance-pill">BoG Act 930</span>
+        <span class="compliance-pill">AML Act 1044</span>
+        <span class="compliance-pill">Data Protection Act 843</span>
+        <span class="compliance-pill">Cybersecurity Act 1038</span>
+        <span class="compliance-pill">DCD 2025</span>
+        <span class="compliance-pill">Credit Reporting Regs 2020</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right: Login Panel ── -->
+  <div class="login-panel">
+
+    <!-- Mobile-only brand -->
+    <div class="d-lg-none mb-4 text-center">
+      <div class="login-hero-logo mx-auto mb-3"><i class="bi bi-bank2"></i></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--white);">Ghana Savings &amp; Loans</div>
+    </div>
+
+    <div class="login-panel-title">Welcome Back</div>
+    <div class="login-panel-sub">Sign in to your account to continue</div>
+
+    <!-- Tab selector -->
+    <ul class="nav nav-pills nav-fill mb-4" id="loginTabs">
+      <li class="nav-item">
+        <a class="nav-link active" id="tab-staff" href="#" onclick="switchTab('staff');return false;">
+          <i class="bi bi-person-badge me-1"></i>Staff Login
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="tab-customer" href="#" onclick="switchTab('customer');return false;">
+          <i class="bi bi-person me-1"></i>Customer Login
+        </a>
+      </li>
+    </ul>
+
+    <div id="errBox"></div>
+
+    <!-- Staff login form -->
+    <form id="staffForm" onsubmit="loginStaff(event)">
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input type="email" id="staffEmail" class="form-control" placeholder="you@gsl.com.gh" required>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" id="staffPass" class="form-control" placeholder="Password" required>
+          <button class="btn btn-outline-secondary" type="button" onclick="togglePwd('staffPass',this)">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-gsl w-100 py-2">
+        <span id="staffBtnText"><i class="bi bi-box-arrow-in-right me-1"></i>Sign In</span>
+        <span id="staffBtnSpin" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Signing in…</span>
+      </button>
+    </form>
+
+    <!-- MFA form -->
+    <form id="mfaForm" class="d-none" onsubmit="verifyMFA(event)">
+      <div class="alert alert-info d-flex gap-2 align-items-center mb-4">
+        <i class="bi bi-shield-lock-fill fs-5"></i>
+        <span>Enter the 6-digit code from your authenticator app.</span>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">MFA Code</label>
+        <input type="text" id="mfaCode" class="form-control form-control-lg text-center"
+               style="font-family:'DM Mono',monospace;font-size:1.4rem;letter-spacing:0.3rem;"
+               maxlength="6" pattern="\d{6}" placeholder="000000" inputmode="numeric" required>
+      </div>
+      <button type="submit" class="btn btn-gsl w-100 py-2">
+        <i class="bi bi-shield-check me-1"></i>Verify &amp; Continue
+      </button>
+    </form>
+
+    <!-- Customer login form -->
+    <form id="customerForm" class="d-none" onsubmit="loginCustomer(event)">
+      <div class="mb-3">
+        <label class="form-label">Phone Number</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-phone"></i></span>
+          <input type="tel" id="custPhone" class="form-control" placeholder="024 000 0000" required>
+        </div>
+        <div class="form-text">Enter your Ghana phone number (e.g. 024xxxxxxx)</div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" id="custPass" class="form-control" placeholder="Password" required>
+          <button class="btn btn-outline-secondary" type="button" onclick="togglePwd('custPass',this)">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-gsl w-100 py-2">
+        <span id="custBtnText"><i class="bi bi-box-arrow-in-right me-1"></i>Sign In</span>
+        <span id="custBtnSpin" class="d-none"><span class="spinner-border spinner-border-sm me-1"></span>Signing in…</span>
+      </button>
+      <hr class="my-3">
+      <p class="text-center small" style="color:var(--grey);">New customer?
+        <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" style="color:var(--gold);">Register here</a>
+      </p>
+    </form>
+
+    <div class="login-footer-text">
+      &copy; 2025 Ghana Savings &amp; Loans Ltd &bull; BoG Licensed MFI &bull; All rights reserved
+    </div>
+  </div>
+</div>
+
+<!-- Customer Registration Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-plus me-2 text-gold"></i>New Customer Registration</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="registerForm" onsubmit="registerCustomer(event)">
+        <div class="modal-body">
+          <div id="regErr"></div>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">First Name</label>
+              <input type="text" id="regFirst" class="form-control" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Last Name</label>
+              <input type="text" id="regLast" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Ghana Card Number</label>
+              <input type="text" id="regCard" class="form-control" placeholder="GHA-XXXXXXXXX-X" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" id="regPhone" class="form-control" placeholder="024xxxxxxx" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Password</label>
+              <input type="password" id="regPass" class="form-control"
+                     placeholder="Min 6 characters" minlength="6" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl">
+            <i class="bi bi-person-check me-1"></i>Register
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+'use strict';
+
+let currentTab = 'staff';
+let pendingEmail = '';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('staffForm').classList.toggle('d-none', tab !== 'staff');
+  document.getElementById('mfaForm').classList.toggle('d-none', true);
+  document.getElementById('customerForm').classList.toggle('d-none', tab !== 'customer');
+  document.getElementById('tab-staff').classList.toggle('active', tab === 'staff');
+  document.getElementById('tab-customer').classList.toggle('active', tab === 'customer');
+  document.getElementById('errBox').innerHTML = '';
+}
+
+function showErr(msg) {
+  document.getElementById('errBox').innerHTML =
+    `<div class="alert alert-danger d-flex gap-2 align-items-center mb-3">
+      <i class="bi bi-exclamation-triangle-fill"></i><span>${msg}</span></div>`;
+}
+
+function togglePwd(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+}
+
+async function loginStaff(e) {
+  e.preventDefault();
+  document.getElementById('errBox').innerHTML = '';
+  const btnT = document.getElementById('staffBtnText');
+  const btnS = document.getElementById('staffBtnSpin');
+  btnT.classList.add('d-none'); btnS.classList.remove('d-none');
+  try {
+    const data = await api('POST', '/auth/login', {
+      email: document.getElementById('staffEmail').value,
+      password: document.getElementById('staffPass').value,
+    });
+    if (data.mfa_required) {
+      pendingEmail = document.getElementById('staffEmail').value;
+      document.getElementById('staffForm').classList.add('d-none');
+      document.getElementById('mfaForm').classList.remove('d-none');
+    } else {
+      Auth.setToken(data.access_token);
+      Auth.setRefresh(data.refresh_token);
+      redirectStaff(data.access_token);
+    }
+  } catch (err) {
+    showErr(err.message);
+  } finally {
+    btnT.classList.remove('d-none'); btnS.classList.add('d-none');
+  }
+}
+
+async function verifyMFA(e) {
+  e.preventDefault();
+  document.getElementById('errBox').innerHTML = '';
+  try {
+    const data = await api('POST', '/auth/mfa/verify', {
+      email: pendingEmail,
+      totp_code: document.getElementById('mfaCode').value,
+    });
+    Auth.setToken(data.access_token);
+    Auth.setRefresh(data.refresh_token);
+    redirectStaff(data.access_token);
+  } catch (err) {
+    showErr(err.message);
+  }
+}
+
+function redirectStaff(token) {
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  const roles = payload.roles || [];
+  if (roles.includes('SUPER_ADMIN') || roles.includes('ADMIN')) {
+    location.href = '/admin';
+  } else {
+    location.href = '/staff';
+  }
+}
+
+async function loginCustomer(e) {
+  e.preventDefault();
+  document.getElementById('errBox').innerHTML = '';
+  const btnT = document.getElementById('custBtnText');
+  const btnS = document.getElementById('custBtnSpin');
+  btnT.classList.add('d-none'); btnS.classList.remove('d-none');
+  try {
+    const data = await api('POST', '/auth/customer/login', {
+      phone: document.getElementById('custPhone').value,
+      password: document.getElementById('custPass').value,
+    });
+    Auth.setToken(data.access_token);
+    Auth.setRefresh(data.refresh_token);
+    location.href = '/customer';
+  } catch (err) {
+    showErr(err.message);
+  } finally {
+    btnT.classList.remove('d-none'); btnS.classList.add('d-none');
+  }
+}
+
+async function registerCustomer(e) {
+  e.preventDefault();
+  document.getElementById('regErr').innerHTML = '';
+  try {
+    const data = await api('POST', '/auth/customer/register', {
+      first_name: document.getElementById('regFirst').value,
+      last_name: document.getElementById('regLast').value,
+      ghana_card_number: document.getElementById('regCard').value,
+      phone: document.getElementById('regPhone').value,
+      password: document.getElementById('regPass').value,
+    });
+    Auth.setToken(data.access_token);
+    Auth.setRefresh(data.refresh_token);
+    location.href = '/customer';
+  } catch (err) {
+    document.getElementById('regErr').innerHTML =
+      `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+// Redirect if already logged in
+if (Auth.getToken() && !Auth.isExpired()) {
+  if (Auth.isCustomer()) location.href = '/customer';
+  else if (Auth.isAdmin()) location.href = '/admin';
+  else location.href = '/staff';
+}
+</script>
+</body>
+</html>

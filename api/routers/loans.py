@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from api import models
@@ -24,6 +25,7 @@ from api.schemas.loans import (
     LoanApprovalRequest,
     LoanApplicationRequest,
     LoanDisbursementRequest,
+    LoanEligibilityResponse,
     LoanListParams,
     LoanProductCreate,
     LoanProductResponse,
@@ -69,6 +71,228 @@ def list_products(
     if active_only:
         q = q.filter_by(is_active=True)
     return q.all()
+
+
+@router.get("/products/available", response_model=list[LoanProductResponse],
+            summary="List available loan products (customer-accessible)")
+def list_products_customer(
+    db: Session = Depends(get_db),
+    _: models.Customer = Depends(get_current_customer),
+):
+    return db.query(models.LoanProduct).filter_by(is_active=True).all()
+
+
+@router.get("/products/{product_id}", response_model=LoanProductResponse,
+            summary="Get single loan product")
+def get_product(
+    product_id: str,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(get_current_user),
+):
+    product = db.query(models.LoanProduct).filter_by(id=product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Loan product not found")
+    return product
+
+
+class LoanProductUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    annual_interest_rate: Decimal | None = Field(
+        default=None, gt=0, le=Decimal("0.60"),
+        description="Max 60% p.a. — BoG cap. DCD 2025 Clause 14.")
+    processing_fee_pct: Decimal | None = Field(default=None, ge=0, le=Decimal("0.10"))
+    insurance_fee_pct: Decimal | None = Field(default=None, ge=0, le=Decimal("0.05"))
+    late_payment_fee_pct: Decimal | None = Field(default=None, ge=0, le=Decimal("0.05"))
+    min_amount_ghs: Decimal | None = Field(default=None, gt=0)
+    max_amount_ghs: Decimal | None = Field(default=None, gt=0)
+    min_tenure_months: int | None = Field(default=None, ge=1)
+    max_tenure_months: int | None = Field(default=None, ge=1, le=120)
+    requires_collateral: bool | None = None
+    requires_guarantor: bool | None = None
+    savings_ratio: Decimal | None = Field(default=None, gt=0, le=Decimal("1.0"))
+    collateral_ratio: Decimal | None = Field(default=None, gt=0, le=Decimal("1.0"))
+    is_active: bool | None = None
+
+
+@router.patch("/products/{product_id}", response_model=LoanProductResponse,
+              summary="Update loan product rates and settings (CREDIT_MANAGER / SUPER_ADMIN)")
+def update_product(
+    product_id: str,
+    body: LoanProductUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_roles("CREDIT_MANAGER", "SUPER_ADMIN")),
+):
+    product = db.query(models.LoanProduct).filter_by(id=product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Loan product not found")
+    changes: dict = {}
+    for field, value in body.model_dump(exclude_none=True).items():
+        setattr(product, field, value)
+        changes[field] = str(value)
+    db.commit()
+    write_audit(db, table_name="loan_products", record_id=product.id, action="UPDATE",
+                actor_id=current_user.id, data=changes)
+    return product
+
+
+# ─── Eligibility ────────────────────────────────────────────────────────────────
+
+def _compute_eligibility(
+    db: Session,
+    customer: models.Customer,
+    product: models.LoanProduct | None = None,
+    collateral_value_ghs: Decimal = Decimal("0"),
+) -> dict:
+    savings_acct = db.query(models.SavingsAccount).filter_by(
+        customer_id=customer.id, status="ACTIVE"
+    ).first()
+    balance = savings_acct.balance if savings_acct else Decimal("0")
+
+    savings_ratio = product.savings_ratio if product else Decimal("0.70")
+    collateral_ratio = product.collateral_ratio if product else Decimal("0.50")
+
+    max_savings_loan = (balance * savings_ratio).quantize(Decimal("0.01"))
+    max_collateral_loan = (collateral_value_ghs * collateral_ratio).quantize(Decimal("0.01"))
+
+    if collateral_value_ghs > 0:
+        effective_max = max_collateral_loan
+        note = f"Based on collateral value × {float(collateral_ratio)*100:.0f}%"
+    else:
+        effective_max = max_savings_loan
+        note = f"Based on savings balance × {float(savings_ratio)*100:.0f}%"
+
+    product_max = product.max_amount_ghs if product else None
+    final_max = min(effective_max, product_max) if product_max else effective_max
+
+    return {
+        "savings_balance": balance,
+        "savings_ratio": savings_ratio,
+        "max_savings_loan": max_savings_loan,
+        "collateral_value_ghs": collateral_value_ghs,
+        "collateral_ratio": collateral_ratio,
+        "max_collateral_loan": max_collateral_loan,
+        "effective_max": effective_max,
+        "product_max": product_max,
+        "final_max": final_max,
+        "note": note,
+    }
+
+
+@router.get("/my/eligibility", response_model=LoanEligibilityResponse,
+            summary="Check customer's loan eligibility")
+def my_loan_eligibility(
+    product_id: str | None = Query(default=None),
+    collateral_value_ghs: Decimal = Query(default=Decimal("0"), ge=0),
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(get_current_customer),
+):
+    product = db.query(models.LoanProduct).filter_by(id=product_id).first() if product_id else None
+    e = _compute_eligibility(db, current_customer, product, collateral_value_ghs)
+    return LoanEligibilityResponse(**e)
+
+
+@router.get("/eligibility/{customer_id}", response_model=LoanEligibilityResponse,
+            summary="Check a customer's loan eligibility (staff)")
+def customer_loan_eligibility(
+    customer_id: str,
+    product_id: str | None = Query(default=None),
+    collateral_value_ghs: Decimal = Query(default=Decimal("0"), ge=0),
+    db: Session = Depends(get_db),
+    _: models.User = Depends(get_current_user),
+):
+    customer = _get_customer_or_404(db, customer_id)
+    product = db.query(models.LoanProduct).filter_by(id=product_id).first() if product_id else None
+    e = _compute_eligibility(db, customer, product, collateral_value_ghs)
+    return LoanEligibilityResponse(**e)
+
+
+class CustomerLoanRequest(BaseModel):
+    product_id: str
+    principal_ghs: Decimal
+    tenure_months: int
+    purpose: str | None = None
+    disbursement_account: str | None = None
+    disbursement_channel: str = "MOBILE_MONEY"
+    collateral_value_ghs: Decimal = Field(default=Decimal("0"), ge=0,
+        description="Estimated value of collateral (0 = no collateral, use savings ratio)")
+
+
+@router.post("/apply", response_model=LoanResponse, status_code=201,
+             summary="Customer submits a loan application for field officer review")
+def customer_apply_loan(
+    body: CustomerLoanRequest,
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(get_current_customer),
+):
+    customer = db.query(models.Customer).filter_by(id=current_customer.id).first()
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    if customer.kyc_status != "ACTIVE":
+        raise HTTPException(
+            status_code=400,
+            detail=f"KYC verification not complete. Current status: {customer.kyc_status}",
+        )
+
+    product = _get_product_or_404(db, body.product_id)
+    _validate_loan_params(product, body.principal_ghs, body.tenure_months)
+
+    # Eligibility check
+    elig = _compute_eligibility(db, customer, product, body.collateral_value_ghs)
+    if body.principal_ghs > elig["effective_max"] and elig["effective_max"] > 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Loan amount exceeds eligibility limit of GHS {elig['effective_max']:.2f}. {elig['note']}",
+        )
+
+    result = _calc.calculate(
+        principal=body.principal_ghs,
+        annual_rate_pct=float(product.annual_interest_rate) * 100,
+        tenure_months=body.tenure_months,
+    )
+
+    processing_fee = (body.principal_ghs * product.processing_fee_pct).quantize(Decimal("0.01"))
+    insurance_fee = (body.principal_ghs * product.insurance_fee_pct).quantize(Decimal("0.01"))
+    total_repayable = result.total_repayable + processing_fee + insurance_fee
+
+    loan = models.Loan(
+        loan_number=generate_loan_number(),
+        customer_id=customer.id,
+        product_id=product.id,
+        principal_ghs=body.principal_ghs,
+        annual_interest_rate=product.annual_interest_rate,
+        tenure_months=body.tenure_months,
+        processing_fee_ghs=processing_fee,
+        insurance_fee_ghs=insurance_fee,
+        total_interest_ghs=result.total_interest,
+        total_repayable_ghs=total_repayable,
+        monthly_instalment_ghs=result.monthly_instalment,
+        apr=Decimal(str(result.apr_pct)).quantize(Decimal("0.0001")) if result.apr_pct else None,
+        outstanding_ghs=total_repayable,
+        disbursement_channel=body.disbursement_channel,
+        disbursement_account=body.disbursement_account,
+        status="APPLICATION",
+        schedule_json=[
+            {
+                "instalment_number": i.instalment_number,
+                "due_date": i.due_date,
+                "principal": str(i.principal),
+                "interest": str(i.interest),
+                "total": str(i.total),
+                "balance_after": str(i.balance_after),
+            }
+            for i in result.schedule
+        ],
+    )
+    db.add(loan)
+    db.commit()
+
+    write_audit(db, table_name="loans", record_id=loan.id, action="CUSTOMER_APPLICATION",
+                actor_id=customer.id,
+                data={"loan_number": loan.loan_number, "principal": str(body.principal_ghs),
+                      "purpose": body.purpose, "collateral_value": str(body.collateral_value_ghs)})
+    return loan
 
 
 # ─── Loan Quotes ───────────────────────────────────────────────────────────────
@@ -369,6 +593,15 @@ def record_repayment(
         transaction={"id": repayment.id, "type": "LOAN_REPAYMENT", "amount": body.amount_ghs},
         actor_id=current_user.id,
     )
+
+    # Commission calculation
+    try:
+        from api.routers.commissions import compute_and_store_commission
+        repayment_count = db.query(models.LoanRepayment).filter_by(loan_id=loan_id).count()
+        compute_and_store_commission(db, loan, repayment, repayment_count)
+        db.commit()
+    except Exception:
+        log.exception("commission_calc_failed repayment_id=%s", repayment.id)
 
     write_audit(db, table_name="loan_repayments", record_id=repayment.id, action="CREATE",
                 actor_id=current_user.id,

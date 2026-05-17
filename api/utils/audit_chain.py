@@ -5,8 +5,8 @@ Regulatory anchor: Cybersecurity Act 2020 (Act 1038), Section 34
 
 Design:
   Each audit log record stores:
-    - record_hash  = SHA-256(table | record_id | action | actor_id | data | previous_hash)
-    - previous_hash = record_hash of the immediately preceding record (or 'GENESIS' for first)
+    - hash         = SHA-256(table | record_id | action | actor_id | data | previous_hash)
+    - previous_hash = hash of the immediately preceding record (or 'GENESIS' for first)
 
   Any modification to any historical record breaks the chain.
   verify_chain() re-computes all hashes and detects tampering.
@@ -56,20 +56,25 @@ def write_audit(
     *,
     table_name: str,
     record_id: str,
-    action: str,                          # CREATE | UPDATE | DELETE | STATE_CHANGE | LOGIN | etc.
-    actor_id: str,                        # user.id or "SYSTEM"
+    action: str,
+    actor_id: str,
+    data: dict[str, Any] | None = None,
+    actor_type: str | None = None,
+    ip_address: str | None = None,
+    # legacy / unused kwargs kept for call-site compatibility
     old_data: dict[str, Any] | None = None,
     new_data: dict[str, Any] | None = None,
     customer_id: str | None = None,
-) -> "AuditLog":                           # type: ignore[name-defined]
+) -> "AuditLog":  # type: ignore[name-defined]
     """Write one tamper-evident audit entry to the database.
 
     This function is the ONLY authorised way to create audit records.
-    Direct INSERT to audit_logs is blocked by a DB-level policy.
-
     Returns the created AuditLog ORM object.
     """
-    from api.models import AuditLog   # local import to avoid circular deps
+    from api.models import AuditLog
+
+    # Normalise data from all aliases
+    effective_data: dict[str, Any] = data or new_data or {}
 
     # Get previous hash (most recent record)
     previous = (
@@ -77,14 +82,14 @@ def write_audit(
         .order_by(AuditLog.created_at.desc())
         .first()
     )
-    previous_hash = previous.record_hash if previous else "GENESIS"
+    previous_hash = previous.hash if previous else "GENESIS"
 
     record_hash = _compute_hash(
         table_name=table_name,
         record_id=record_id,
         action=action,
         actor_id=actor_id,
-        data=new_data or {},
+        data=effective_data,
         previous_hash=previous_hash,
     )
 
@@ -94,15 +99,15 @@ def write_audit(
         record_id=record_id,
         action=action,
         actor_id=actor_id,
-        customer_id=customer_id,
-        old_data=old_data,
-        new_data=new_data,
-        record_hash=record_hash,
+        actor_type=actor_type or "USER",
+        data=effective_data,
+        ip_address=ip_address,
         previous_hash=previous_hash,
+        hash=record_hash,
         created_at=datetime.now(timezone.utc),
     )
     db.add(entry)
-    db.flush()   # assign PK without full commit so caller can rollback atomically
+    db.flush()
     return entry
 
 
@@ -118,10 +123,6 @@ def verify_chain(db: Session) -> dict[str, Any]:
       - tampered_count: number of broken records
 
     Raises AuditChainTampered immediately on first detected break.
-    This function should be called:
-      - Daily by the compliance scheduler
-      - Before every BoG/FIC examination export
-      - After any DB restore from backup
     """
     from api.models import AuditLog
 
@@ -149,15 +150,15 @@ def verify_chain(db: Session) -> dict[str, Any]:
             record_id=record.record_id,
             action=record.action,
             actor_id=record.actor_id,
-            data=record.new_data or {},
+            data=record.data or {},
             previous_hash=record.previous_hash,
         )
-        if expected_hash != record.record_hash:
+        if expected_hash != record.hash:
             tampered_count += 1
             if first_tampered_id is None:
                 first_tampered_id = record.id
 
-        previous_hash = record.record_hash
+        previous_hash = record.hash
 
     if tampered_count > 0:
         raise AuditChainTampered(
@@ -188,7 +189,7 @@ def export_audit_range(
     Always verifies chain before export to ensure integrity.
     Raises AuditChainTampered if chain is broken.
     """
-    verify_chain(db)   # MANDATORY — never export without verification
+    verify_chain(db)
 
     from api.models import AuditLog
 
@@ -206,9 +207,10 @@ def export_audit_range(
             "record_id": r.record_id,
             "action": r.action,
             "actor_id": r.actor_id,
-            "old_data": r.old_data,
-            "new_data": r.new_data,
-            "record_hash": r.record_hash,
+            "actor_type": r.actor_type,
+            "data": r.data,
+            "ip_address": r.ip_address,
+            "hash": r.hash,
             "previous_hash": r.previous_hash,
             "timestamp": r.created_at.isoformat(),
         }

@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff Portal — Ghana Savings &amp; Loans</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <style>
+    body { background: var(--dark2); padding-top: 34px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Ticker Bar ── -->
+<div class="ticker-bar">
+  <div class="ticker-label">GSL RATES</div>
+  <div class="ticker-track">
+    <div class="ticker-inner">
+      <span class="tick-item"><span class="tick-sym">BOG POLICY RATE</span><span class="tick-val tick-nc">28.0%</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">USD / GHS</span><span class="tick-val tick-dn">15.30</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">EUR / GHS</span><span class="tick-val tick-dn">16.48</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">GBP / GHS</span><span class="tick-val tick-dn">19.42</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">SAVINGS RATE</span><span class="tick-val tick-up">15.0% p.a.</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AML</span><span class="tick-val tick-nc">Act 1044 · FIC Ghana</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DATA RESIDENCY</span><span class="tick-val tick-nc">Act 843 Enforced</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DCD 2025</span><span class="tick-val tick-nc">Simple Interest Compliant</span></span>
+      <span class="tick-divider">·</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="tick-item"><span class="tick-sym">BOG POLICY RATE</span><span class="tick-val tick-nc">28.0%</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">USD / GHS</span><span class="tick-val tick-dn">15.30</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">EUR / GHS</span><span class="tick-val tick-dn">16.48</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">GBP / GHS</span><span class="tick-val tick-dn">19.42</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">SAVINGS RATE</span><span class="tick-val tick-up">15.0% p.a.</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AML</span><span class="tick-val tick-nc">Act 1044 · FIC Ghana</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DATA RESIDENCY</span><span class="tick-val tick-nc">Act 843 Enforced</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DCD 2025</span><span class="tick-val tick-nc">Simple Interest Compliant</span></span>
+      <span class="tick-divider">·</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <a class="brand-logo" href="/staff">
+      <div class="logo-box"><i class="bi bi-bank2"></i></div>
+      <div class="logo-text">
+        <strong>Ghana S&amp;L</strong>
+        <small>Staff Portal</small>
+      </div>
+    </a>
+  </div>
+
+  <ul class="sidebar-nav nav flex-column mt-1">
+    <li class="nav-item"><a class="nav-link" href="#dashboard" data-section="dashboard"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link" href="#customers" data-section="customers"><i class="bi bi-people"></i>Customers</a></li>
+    <li class="nav-item"><a class="nav-link" href="#loans"     data-section="loans"><i class="bi bi-cash-coin"></i>Loans</a></li>
+    <li class="nav-item"><a class="nav-link" href="#savings"   data-section="savings"><i class="bi bi-piggy-bank"></i>Savings</a></li>
+    <li class="nav-item"><a class="nav-link" href="#reports"   data-section="reports"><i class="bi bi-bar-chart-line"></i>Reports</a></li>
+    <li class="nav-item"><a class="nav-link" href="#mycommissions" data-section="mycommissions"><i class="bi bi-percent"></i>My Commissions</a></li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <div class="mb-2" style="font-size:0.72rem;color:var(--grey);" id="sidebarUser">Loading…</div>
+    <button class="btn btn-outline-light btn-sm w-100" onclick="logout()">
+      <i class="bi bi-box-arrow-right me-1"></i>Logout
+    </button>
+  </div>
+</nav>
+
+<!-- ── Main content ── -->
+<div class="main-content">
+
+  <!-- ══════════════ DASHBOARD ══════════════ -->
+  <div id="sec-dashboard">
+    <div class="section-title">Dashboard</div>
+
+    <div class="row g-3 mb-4" id="statsRow">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-people"></i></div>
+          <div><div class="stat-value" id="st-customers">—</div><div class="stat-label">Total Customers</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-cash-coin"></i></div>
+          <div><div class="stat-value" id="st-active-loans">—</div><div class="stat-label">Active Loans</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+          <div><div class="stat-value" id="st-overdue">—</div><div class="stat-label">Overdue Loans</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="bi bi-piggy-bank"></i></div>
+          <div><div class="stat-value" id="st-savings">—</div><div class="stat-label">Savings Accounts</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header"><i class="bi bi-people me-2" style="color:var(--gold);"></i>Recent Customers</div>
+          <div class="card-body p-0" id="dashRecentCust">
+            <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header"><i class="bi bi-clock-history me-2" style="color:var(--gold);"></i>Pending Loan Applications</div>
+          <div class="card-body p-0" id="dashPendingLoans">
+            <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CUSTOMERS ══════════════ -->
+  <div id="sec-customers" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0">Customer Management</div>
+      <button class="btn btn-gsl" data-bs-toggle="modal" data-bs-target="#createCustModal">
+        <i class="bi bi-person-plus me-1"></i>New Customer
+      </button>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4">
+            <input type="text" id="custSearch" class="form-control" placeholder="Search name, phone, account…">
+          </div>
+          <div class="col-md-2">
+            <select id="custKYC" class="form-select">
+              <option value="">All KYC Status</option>
+              <option>PENDING_GHANA_CARD</option><option>ACTIVE</option><option>PENDING_LIVENESS</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="custRisk" class="form-select">
+              <option value="">All Risk Levels</option>
+              <option>LOW</option><option>MEDIUM</option><option>HIGH</option>
+            </select>
+          </div>
+          <div class="col-auto"><button class="btn btn-gsl" onclick="searchCustomers()"><i class="bi bi-search me-1"></i>Search</button></div>
+          <div class="col-auto"><button class="btn btn-outline-secondary" onclick="searchCustomers(true)">Reset</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0" id="custTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ LOANS ══════════════ -->
+  <div id="sec-loans" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0">Loan Management</div>
+      <button class="btn btn-gsl" data-bs-toggle="modal" data-bs-target="#newLoanModal">
+        <i class="bi bi-plus-circle me-1"></i>New Loan Application
+      </button>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-3">
+            <select id="loanStatusFilter" class="form-select" onchange="loadLoans()">
+              <option value="">All Status</option>
+              <option>APPLICATION</option><option>CREDIT_CHECK</option><option>APPROVED</option>
+              <option>DISBURSED</option><option>ACTIVE</option><option>OVERDUE</option>
+              <option>SETTLED</option><option>REJECTED</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="text" id="loanCustFilter" class="form-control" placeholder="Customer ID (optional)">
+          </div>
+          <div class="col-auto"><button class="btn btn-gsl" onclick="loadLoans()"><i class="bi bi-search me-1"></i>Filter</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0" id="loanTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SAVINGS ══════════════ -->
+  <div id="sec-savings" class="d-none">
+    <div class="section-title">Savings Accounts</div>
+
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4">
+            <input type="text" id="savSearch" class="form-control" placeholder="Customer ID or Account Number">
+          </div>
+          <div class="col-auto"><button class="btn btn-gsl" onclick="searchSavings()"><i class="bi bi-search me-1"></i>Search</button></div>
+          <div class="col-auto"><button class="btn btn-outline-secondary" onclick="loadSavings()">All Accounts</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0" id="savTable">
+        <div class="text-center py-4" style="color:var(--grey);">Click "All Accounts" to load</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ REPORTS ══════════════ -->
+  <div id="sec-reports" class="d-none">
+    <div class="section-title">Reports &amp; Analytics</div>
+    <div class="row g-3 mb-4" id="reportStats"></div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header fw-semibold">
+            <i class="bi bi-exclamation-circle me-2" style="color:#f87171;"></i>Overdue Loans
+          </div>
+          <div class="card-body p-0" id="overdueTable">
+            <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header fw-semibold">
+            <i class="bi bi-cash-stack me-2" style="color:#4ade80;"></i>Portfolio Summary
+          </div>
+          <div class="card-body" id="portfolioSummary">
+            <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MY COMMISSIONS ══════════════ -->
+  <div id="sec-mycommissions" class="d-none">
+    <div class="section-title">My Commission Earnings</div>
+    <!-- Summary cards -->
+    <div class="row g-3 mb-4" id="myCommCards">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="bi bi-currency-dollar"></i></div>
+          <div><div class="stat-value" id="mcTotalEarned">—</div><div class="stat-label">Total Earned</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-clock-history"></i></div>
+          <div><div class="stat-value" id="mcPending">—</div><div class="stat-label">Pending Payment</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+          <div><div class="stat-value" id="mcPaid">—</div><div class="stat-label">Total Paid</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body p-0" id="myCommTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- ── Create Customer Modal ── -->
+<div class="modal fade" id="createCustModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-plus me-2" style="color:var(--gold);"></i>Onboard New Customer</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="createCustForm" onsubmit="createCustomer(event)">
+        <div class="modal-body">
+          <div id="ccErr"></div>
+          <div class="row g-3">
+            <div class="col-md-4"><label class="form-label">First Name *</label><input type="text" id="ccFirst" class="form-control" required></div>
+            <div class="col-md-4"><label class="form-label">Last Name *</label><input type="text" id="ccLast" class="form-control" required></div>
+            <div class="col-md-4"><label class="form-label">Other Names</label><input type="text" id="ccOther" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Ghana Card Number *</label><input type="text" id="ccCard" class="form-control" placeholder="GHA-XXXXXXXXX-X" required></div>
+            <div class="col-md-6"><label class="form-label">Phone Number *</label><input type="tel" id="ccPhone" class="form-control" placeholder="024xxxxxxx" required></div>
+            <div class="col-md-6"><label class="form-label">Email</label><input type="email" id="ccEmail" class="form-control"></div>
+            <div class="col-md-3"><label class="form-label">Date of Birth</label><input type="date" id="ccDOB" class="form-control"></div>
+            <div class="col-md-3"><label class="form-label">Gender</label><select id="ccGender" class="form-select"><option value="">Select…</option><option>MALE</option><option>FEMALE</option><option>OTHER</option></select></div>
+            <div class="col-md-6"><label class="form-label">Residential Address</label><input type="text" id="ccAddr" class="form-control"></div>
+            <div class="col-md-3"><label class="form-label">Region</label><input type="text" id="ccRegion" class="form-control" placeholder="e.g. Greater Accra"></div>
+            <div class="col-md-3"><label class="form-label">District</label><input type="text" id="ccDistrict" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Occupation</label><input type="text" id="ccOcc" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Monthly Income (GHS)</label><input type="number" id="ccIncome" class="form-control" step="0.01"></div>
+            <div class="col-md-6"><label class="form-label">Customer Type</label><select id="ccType" class="form-select"><option value="INDIVIDUAL">Individual</option><option value="SME">SME / Business</option></select></div>
+            <div class="col-md-6"><label class="form-label">Initial Password *</label><input type="password" id="ccPass" class="form-control" minlength="6" required></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-person-check me-1"></i>Create Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Customer Detail Modal ── -->
+<div class="modal fade" id="custDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="custDetailTitle">Customer Details</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="custDetailBody">
+        <div class="text-center py-4"><div class="spinner-border" style="color:var(--gold);"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Approve/Reject Loan Modal ── -->
+<div class="modal fade" id="approveLoanModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveTitle">Loan Decision</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="approveErr"></div>
+        <input type="hidden" id="approveLoanId">
+        <div class="mb-3">
+          <label class="form-label">MFA Code (required)</label>
+          <input type="text" id="approveMFA" class="form-control" maxlength="6" pattern="\d{6}" placeholder="000000" inputmode="numeric">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Notes</label>
+          <textarea id="approveNotes" class="form-control" rows="2"></textarea>
+        </div>
+        <div id="rejectReasonDiv" class="mb-3 d-none">
+          <label class="form-label">Rejection Reason *</label>
+          <input type="text" id="rejectReason" class="form-control" placeholder="Reason for rejection">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger" onclick="submitLoanDecision(false)"><i class="bi bi-x-circle me-1"></i>Reject</button>
+        <button class="btn btn-success" onclick="submitLoanDecision(true)"><i class="bi bi-check-circle me-1"></i>Approve</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Disburse Loan Modal ── -->
+<div class="modal fade" id="disburseLoanModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Disburse Loan</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="disburseErr"></div>
+        <input type="hidden" id="disburseLoanId">
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>This action is <strong>irreversible</strong>. Confirm all details before proceeding.
+        </div>
+        <div class="mb-3"><label class="form-label">MFA Code *</label><input type="text" id="disburseMFA" class="form-control" maxlength="6" pattern="\d{6}" inputmode="numeric"></div>
+        <div class="mb-3"><label class="form-label">Disbursement Account</label><input type="text" id="disburseAcct" class="form-control" placeholder="MoMo number or bank account"></div>
+        <div class="mb-3">
+          <label class="form-label">Channel</label>
+          <select id="disburseChannel" class="form-select"><option>MOBILE_MONEY</option><option>BANK_TRANSFER</option><option>CASH</option></select>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="disburseConfirm">
+          <label class="form-check-label fw-semibold text-danger" for="disburseConfirm">I confirm this disbursement is authorised</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger" onclick="submitDisbursement()"><i class="bi bi-send me-1"></i>Disburse Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Record Repayment Modal ── -->
+<div class="modal fade" id="repayModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Record Repayment</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="submitRepayment(event)">
+        <div class="modal-body">
+          <div id="repayErr"></div>
+          <input type="hidden" id="repayLoanId">
+          <div class="mb-3"><label class="form-label">Amount (GHS) *</label><input type="number" id="repayAmt" class="form-control" step="0.01" min="1" required></div>
+          <div class="mb-3"><label class="form-label">Channel</label><select id="repayChannel" class="form-select"><option>CASH</option><option>MOBILE_MONEY</option><option>BANK_TRANSFER</option></select></div>
+          <div class="mb-3"><label class="form-label">MoMo Reference (optional)</label><input type="text" id="repayRef" class="form-control"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i>Record Payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Savings Deposit Modal (Staff) ── -->
+<div class="modal fade" id="savDepModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Post Deposit</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="submitSavDeposit(event)">
+        <div class="modal-body">
+          <div id="savDepErr"></div>
+          <input type="hidden" id="savDepAcctId">
+          <div class="mb-3"><label class="form-label">Amount (GHS) *</label><input type="number" id="savDepAmt" class="form-control" step="0.01" min="0.01" required></div>
+          <div class="mb-3"><label class="form-label">Channel</label><select id="savDepChan" class="form-select"><option>CASH</option><option>MOBILE_MONEY</option><option>BANK_TRANSFER</option><option>GHIPSS</option></select></div>
+          <div class="mb-3"><label class="form-label">Narration</label><input type="text" id="savDepNote" class="form-control"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i>Post Deposit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── New Loan Modal (Staff) ── -->
+<div class="modal fade" id="newLoanModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-cash-coin me-2" style="color:var(--gold);"></i>New Loan Application</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="submitNewLoan(event)">
+        <div class="modal-body">
+          <div id="newLoanErr"></div>
+          <div class="mb-3"><label class="form-label">Customer ID *</label><input type="text" id="nlCustId" class="form-control" placeholder="Customer UUID" required></div>
+          <div class="mb-3">
+            <label class="form-label">Loan Product *</label>
+            <select id="nlProduct" class="form-select" required onchange="updateNewLoanLimits()"><option value="">Select…</option></select>
+          </div>
+          <div class="row g-3">
+            <div class="col-6"><label class="form-label">Principal (GHS) *</label><input type="number" id="nlAmt" class="form-control" step="100" required><div class="form-text" id="nlAmtHint"></div></div>
+            <div class="col-6"><label class="form-label">Tenure (months) *</label><input type="number" id="nlTenure" class="form-control" required><div class="form-text" id="nlTenureHint"></div></div>
+          </div>
+          <div class="mb-3 mt-3"><label class="form-label">Disbursement Account</label><input type="text" id="nlAcct" class="form-control" placeholder="MoMo/bank number"></div>
+          <div class="mb-3">
+            <label class="form-label">Disbursement Channel</label>
+            <select id="nlChannel" class="form-select"><option>MOBILE_MONEY</option><option>BANK_TRANSFER</option><option>CASH</option></select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-send me-1"></i>Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+'use strict';
+if (!requireAuth('staff')) throw new Error('not authenticated');
+
+const SECTIONS = ['dashboard','customers','loans','savings','reports','mycommissions'];
+initNav(SECTIONS, 'dashboard', loadSection);
+
+let _loanProducts = [];
+
+async function loadSection(sec) {
+  if (sec === 'dashboard') await loadDashboard();
+  if (sec === 'customers') await searchCustomers(true);
+  if (sec === 'loans')     await loadLoans();
+  if (sec === 'savings')   { /* user clicks "All Accounts" */ }
+  if (sec === 'reports')   await loadReports();
+  if (sec === 'mycommissions') await loadMyCommissions();
+}
+
+// ── Sidebar user display ─────────────────────────────────────────────────────
+(async () => {
+  try {
+    const me = await api('GET', '/auth/me');
+    document.getElementById('sidebarUser').textContent =
+      `${me.full_name || me.email} · ${(me.roles||[]).join(', ')}`;
+  } catch {}
+})();
+
+// ── Dashboard ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [custs, loans] = await Promise.all([
+      api('GET', '/customers?page_size=5'),
+      api('GET', '/loans?status=APPLICATION&page_size=5'),
+    ]);
+
+    try {
+      const stats = await api('GET', '/admin/system/stats');
+      document.getElementById('st-customers').textContent = stats.customers.total;
+      document.getElementById('st-active-loans').textContent = stats.loans.active + stats.loans.disbursed;
+      document.getElementById('st-overdue').textContent = stats.loans.overdue;
+      document.getElementById('st-savings').textContent = stats.savings.active_accounts;
+    } catch {
+      document.getElementById('st-customers').textContent = custs?.total || '—';
+    }
+
+    const items = custs?.items || [];
+    document.getElementById('dashRecentCust').innerHTML = buildTable(
+      ['Name','Phone','KYC','Risk'],
+      items.map(c => [
+        `<a href="#customers" onclick="viewCustomer('${c.id}')">${c.first_name} ${c.last_name}</a>`,
+        c.phone_e164, badge(c.kyc_status), c.risk_level || '—'
+      ])
+    );
+
+    const pending = loans || [];
+    document.getElementById('dashPendingLoans').innerHTML = buildTable(
+      ['Loan #','Customer','Amount','Applied'],
+      pending.map(l => [
+        `<code>${l.loan_number}</code>`,
+        l.customer_id?.slice(0,8)+'…',
+        fmt(l.principal_ghs), fmtD(l.created_at)
+      ])
+    );
+  } catch (err) {
+    toast('Dashboard error: ' + err.message, 'danger');
+  }
+}
+
+// ── Customers ─────────────────────────────────────────────────────────────────
+async function searchCustomers(reset = false) {
+  if (reset === true) {
+    document.getElementById('custSearch').value = '';
+    document.getElementById('custKYC').value = '';
+    document.getElementById('custRisk').value = '';
+  }
+  let url = '/customers?page_size=30';
+  const q = document.getElementById('custSearch')?.value?.trim();
+  const kyc = document.getElementById('custKYC')?.value;
+  const risk = document.getElementById('custRisk')?.value;
+  if (q) url += `&q=${encodeURIComponent(q)}`;
+  if (kyc) url += `&kyc_status=${kyc}`;
+  if (risk) url += `&risk_level=${risk}`;
+
+  try {
+    const data = await api('GET', url);
+    const items = data?.items || [];
+    document.getElementById('custTable').innerHTML = buildTable(
+      ['Account #','Name','Phone','KYC Status','Risk','Suspended','Actions'],
+      items.map(c => [
+        `<code class="small">${c.account_number}</code>`,
+        `${c.first_name} ${c.last_name}`,
+        c.phone_e164,
+        badge(c.kyc_status),
+        c.risk_level || '—',
+        c.is_suspended ? '<span class="badge bg-danger">Yes</span>' : '<span class="badge bg-success">No</span>',
+        `<div class="d-flex gap-1 flex-wrap">
+          <button class="btn btn-xs btn-outline-primary" onclick="viewCustomer('${c.id}')"><i class="bi bi-eye"></i></button>
+          ${c.kyc_status === 'PENDING_REVIEW'
+            ? `<button class="btn btn-xs btn-success" onclick="approveKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-check-lg"></i> Approve</button>
+               <button class="btn btn-xs btn-danger"  onclick="rejectKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-x-lg"></i> Reject</button>`
+            : ''}
+          ${c.is_suspended
+            ? `<button class="btn btn-xs btn-outline-success" onclick="unsuspendCust('${c.id}')"><i class="bi bi-unlock"></i></button>`
+            : `<button class="btn btn-xs btn-outline-danger"  onclick="suspendCust('${c.id}')"><i class="bi bi-lock"></i></button>`}
+        </div>`
+      ])
+    );
+    if (!items.length) document.getElementById('custTable').innerHTML =
+      '<div class="text-center py-4" style="color:var(--grey);">No customers found</div>';
+  } catch (err) {
+    toast('Search error: ' + err.message, 'danger');
+  }
+}
+
+async function viewCustomer(id) {
+  const modal = new bootstrap.Modal('#custDetailModal');
+  document.getElementById('custDetailBody').innerHTML = '<div class="text-center py-4"><div class="spinner-border" style="color:var(--gold);"></div></div>';
+  modal.show();
+  try {
+    const [c, loans] = await Promise.all([
+      api('GET', `/customers/${id}`),
+      api('GET', `/loans?customer_id=${id}`),
+    ]);
+    document.getElementById('custDetailTitle').textContent = `${c.first_name} ${c.last_name} — ${c.account_number}`;
+    document.getElementById('custDetailBody').innerHTML = `
+      <div class="row g-4">
+        <div class="col-md-6">
+          <h6 class="fw-bold mb-2" style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1rem;">Personal Info</h6>
+          <dl class="row small mb-0">
+            <dt class="col-5">Ghana Card</dt><dd class="col-7 font-monospace">${c.ghana_card_number||'—'}</dd>
+            <dt class="col-5">Phone</dt><dd class="col-7">${c.phone_e164||'—'}</dd>
+            <dt class="col-5">Email</dt><dd class="col-7">${c.email||'—'}</dd>
+            <dt class="col-5">DOB</dt><dd class="col-7">${fmtD(c.date_of_birth)}</dd>
+            <dt class="col-5">Gender</dt><dd class="col-7">${c.gender||'—'}</dd>
+            <dt class="col-5">Address</dt><dd class="col-7">${c.residential_address||'—'}</dd>
+            <dt class="col-5">Region</dt><dd class="col-7">${c.region||'—'}</dd>
+            <dt class="col-5">Occupation</dt><dd class="col-7">${c.occupation||'—'}</dd>
+            <dt class="col-5">Income/month</dt><dd class="col-7">${c.monthly_income_ghs ? fmt(c.monthly_income_ghs) : '—'}</dd>
+          </dl>
+        </div>
+        <div class="col-md-6">
+          <h6 class="fw-bold mb-2" style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1rem;">Account Status</h6>
+          <dl class="row small mb-0">
+            <dt class="col-5">Account #</dt><dd class="col-7 font-monospace fw-bold">${c.account_number}</dd>
+            <dt class="col-5">KYC Status</dt><dd class="col-7">${badge(c.kyc_status)}</dd>
+            <dt class="col-5">Risk Level</dt><dd class="col-7">${c.risk_level||'—'}</dd>
+            <dt class="col-5">PEP</dt><dd class="col-7">${c.is_pep?'<span class="badge bg-danger">YES</span>':'No'}</dd>
+            <dt class="col-5">Sanctions</dt><dd class="col-7">${c.sanctions_match?'<span class="badge bg-danger">MATCH</span>':'Clear'}</dd>
+            <dt class="col-5">Suspended</dt><dd class="col-7">${c.is_suspended?`<span class="badge bg-danger">Yes</span> <small>${c.suspension_reason||''}</small>`:'No'}</dd>
+            <dt class="col-5">Member Since</dt><dd class="col-7">${fmtD(c.created_at)}</dd>
+          </dl>
+        </div>
+        <div class="col-12">
+          <h6 class="fw-bold mb-2" style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1rem;">Loans (${(loans||[]).length})</h6>
+          ${buildTable(['Loan #','Amount','Status','Outstanding','Applied'],
+            (loans||[]).map(l => [`<code>${l.loan_number}</code>`, fmt(l.principal_ghs),
+              badge(l.status), fmt(l.outstanding_ghs), fmtD(l.created_at)]))}
+        </div>
+      </div>`;
+  } catch (err) {
+    document.getElementById('custDetailBody').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+async function createCustomer(e) {
+  e.preventDefault();
+  document.getElementById('ccErr').innerHTML = '';
+  try {
+    const body = {
+      first_name: document.getElementById('ccFirst').value,
+      last_name: document.getElementById('ccLast').value,
+      other_names: document.getElementById('ccOther').value || null,
+      ghana_card_number: document.getElementById('ccCard').value,
+      phone: document.getElementById('ccPhone').value,
+      email: document.getElementById('ccEmail').value || null,
+      date_of_birth: document.getElementById('ccDOB').value || null,
+      gender: document.getElementById('ccGender').value || null,
+      residential_address: document.getElementById('ccAddr').value || null,
+      region: document.getElementById('ccRegion').value || null,
+      district: document.getElementById('ccDistrict').value || null,
+      occupation: document.getElementById('ccOcc').value || null,
+      monthly_income_ghs: document.getElementById('ccIncome').value ? parseFloat(document.getElementById('ccIncome').value) : null,
+      customer_type: document.getElementById('ccType').value,
+      password: document.getElementById('ccPass').value,
+    };
+    await api('POST', '/customers', body);
+    bootstrap.Modal.getInstance('#createCustModal').hide();
+    document.getElementById('createCustForm').reset();
+    toast('Customer created successfully!');
+    await searchCustomers(true);
+  } catch (err) {
+    document.getElementById('ccErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+async function approveKYC(id, name) {
+  if (!confirm2(`Approve KYC for ${name}? This will activate their account.`)) return;
+  try {
+    await api('POST', `/customers/${id}/kyc/approve`);
+    toast(`${name} — account approved and activated.`, 'success');
+    await searchCustomers();
+  } catch (err) { toast('Approve failed: ' + err.message, 'danger'); }
+}
+
+async function rejectKYC(id, name) {
+  const reason = prompt(`Rejection reason for ${name}:`);
+  if (reason === null) return;
+  try {
+    await api('POST', `/customers/${id}/kyc/reject?reason=${encodeURIComponent(reason || 'KYC requirements not met')}`);
+    toast(`${name} — KYC rejected.`, 'warning');
+    await searchCustomers();
+  } catch (err) { toast('Reject failed: ' + err.message, 'danger'); }
+}
+
+async function suspendCust(id) {
+  const reason = prompt('Enter reason for suspension:');
+  if (!reason) return;
+  try {
+    await api('POST', `/customers/${id}/suspend?reason=${encodeURIComponent(reason)}`);
+    toast('Account suspended.');
+    await searchCustomers();
+  } catch (err) { toast(err.message, 'danger'); }
+}
+
+async function unsuspendCust(id) {
+  if (!confirm2('Reinstate this customer account?')) return;
+  try {
+    await api('POST', `/customers/${id}/unsuspend`);
+    toast('Account reinstated.');
+    await searchCustomers();
+  } catch (err) { toast(err.message, 'danger'); }
+}
+
+// ── Loans ─────────────────────────────────────────────────────────────────────
+async function loadLoans() {
+  let url = '/loans?page_size=50';
+  const status = document.getElementById('loanStatusFilter')?.value;
+  const custId = document.getElementById('loanCustFilter')?.value?.trim();
+  if (status) url += `&status=${status}`;
+  if (custId) url += `&customer_id=${custId}`;
+  try {
+    const loans = await api('GET', url);
+    const roles = Auth.getRoles();
+    const isCM = roles.includes('CREDIT_MANAGER') || roles.includes('SUPER_ADMIN');
+    const isSA = roles.includes('SUPER_ADMIN');
+    const isTeller = roles.includes('TELLER') || roles.includes('FIELD_OFFICER') || isCM || isSA;
+
+    document.getElementById('loanTable').innerHTML = buildTable(
+      ['Loan #','Customer','Principal','Status','Outstanding','Next Due','Actions'],
+      (loans||[]).map(l => [
+        `<code class="small">${l.loan_number}</code>`,
+        l.customer_id?.slice(0,8)+'…',
+        fmt(l.principal_ghs),
+        badge(l.status),
+        `<span class="${parseFloat(l.outstanding_ghs)>0?'text-danger':''}">${fmt(l.outstanding_ghs)}</span>`,
+        l.next_due_date ? fmtD(l.next_due_date) : '—',
+        `<div class="d-flex gap-1 flex-wrap">
+          ${isCM && ['APPLICATION','CREDIT_CHECK','DOCUMENT_COLLECTION','CREDIT_COMMITTEE'].includes(l.status)
+            ? `<button class="btn btn-xs btn-outline-success" onclick="openApprove('${l.id}','${l.loan_number}')"><i class="bi bi-check-circle"></i> Approve</button>` : ''}
+          ${isSA && l.status === 'APPROVED'
+            ? `<button class="btn btn-xs btn-outline-primary" onclick="openDisburse('${l.id}')"><i class="bi bi-send"></i> Disburse</button>` : ''}
+          ${isTeller && ['DISBURSED','ACTIVE','OVERDUE'].includes(l.status)
+            ? `<button class="btn btn-xs btn-outline-secondary" onclick="openRepay('${l.id}','${l.outstanding_ghs}')"><i class="bi bi-wallet2"></i> Repayment</button>` : ''}
+        </div>`
+      ])
+    );
+    if (!(loans||[]).length) document.getElementById('loanTable').innerHTML =
+      '<div class="text-center py-4" style="color:var(--grey);">No loans found</div>';
+  } catch (err) {
+    toast('Error loading loans: ' + err.message, 'danger');
+  }
+}
+
+async function loadLoanProducts() {
+  if (_loanProducts.length) return;
+  try {
+    _loanProducts = await api('GET', '/loans/products');
+    const sel = document.getElementById('nlProduct');
+    sel.innerHTML = '<option value="">Select…</option>' + _loanProducts.map(p =>
+      `<option value="${p.id}" data-min="${p.min_amount_ghs}" data-max="${p.max_amount_ghs}"
+        data-tmin="${p.min_tenure_months}" data-tmax="${p.max_tenure_months}">
+        ${p.name} (${(parseFloat(p.annual_interest_rate)*100).toFixed(1)}% p.a.)</option>`
+    ).join('');
+  } catch (err) { toast('Could not load loan products: ' + err.message, 'warning'); }
+}
+
+document.getElementById('newLoanModal').addEventListener('show.bs.modal', loadLoanProducts);
+
+function updateNewLoanLimits() {
+  const sel = document.getElementById('nlProduct');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+  document.getElementById('nlAmtHint').textContent = `GHS ${opt.dataset.min} – ${opt.dataset.max}`;
+  document.getElementById('nlTenureHint').textContent = `${opt.dataset.tmin} – ${opt.dataset.tmax} months`;
+}
+
+async function submitNewLoan(e) {
+  e.preventDefault();
+  document.getElementById('newLoanErr').innerHTML = '';
+  try {
+    await api('POST', '/loans', {
+      customer_id: document.getElementById('nlCustId').value,
+      product_id: document.getElementById('nlProduct').value,
+      principal_ghs: parseFloat(document.getElementById('nlAmt').value),
+      tenure_months: parseInt(document.getElementById('nlTenure').value),
+      disbursement_account: document.getElementById('nlAcct').value || null,
+      disbursement_channel: document.getElementById('nlChannel').value,
+    });
+    bootstrap.Modal.getInstance('#newLoanModal').hide();
+    toast('Loan application created!');
+    await loadLoans();
+  } catch (err) {
+    document.getElementById('newLoanErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+function openApprove(id, num) {
+  document.getElementById('approveLoanId').value = id;
+  document.getElementById('approveTitle').textContent = `Decision: ${num}`;
+  document.getElementById('approveErr').innerHTML = '';
+  document.getElementById('approveMFA').value = '';
+  document.getElementById('approveNotes').value = '';
+  document.getElementById('rejectReasonDiv').classList.add('d-none');
+  new bootstrap.Modal('#approveLoanModal').show();
+}
+
+async function submitLoanDecision(approved) {
+  document.getElementById('approveErr').innerHTML = '';
+  if (!approved) document.getElementById('rejectReasonDiv').classList.remove('d-none');
+  const mfa = document.getElementById('approveMFA').value;
+  const notes = document.getElementById('approveNotes').value;
+  const reason = document.getElementById('rejectReason').value;
+  if (!approved && !reason) { toast('Please enter a rejection reason', 'warning'); return; }
+  try {
+    const headers = mfa ? { 'X-MFA-Token': mfa } : {};
+    await api('POST', `/loans/${document.getElementById('approveLoanId').value}/approve`,
+      { approved, notes, rejection_reason: reason || null }, { headers });
+    bootstrap.Modal.getInstance('#approveLoanModal').hide();
+    toast(approved ? 'Loan approved!' : 'Loan rejected.');
+    await loadLoans();
+  } catch (err) {
+    document.getElementById('approveErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+function openDisburse(id) {
+  document.getElementById('disburseLoanId').value = id;
+  document.getElementById('disburseErr').innerHTML = '';
+  document.getElementById('disburseMFA').value = '';
+  document.getElementById('disburseConfirm').checked = false;
+  new bootstrap.Modal('#disburseLoanModal').show();
+}
+
+async function submitDisbursement() {
+  if (!document.getElementById('disburseConfirm').checked) {
+    toast('Please confirm the disbursement', 'warning'); return;
+  }
+  const mfa = document.getElementById('disburseMFA').value;
+  try {
+    const headers = mfa ? { 'X-MFA-Token': mfa } : {};
+    await api('POST', `/loans/${document.getElementById('disburseLoanId').value}/disburse`, {
+      disbursement_account: document.getElementById('disburseAcct').value || null,
+      disbursement_channel: document.getElementById('disburseChannel').value,
+      confirm: true,
+    }, { headers });
+    bootstrap.Modal.getInstance('#disburseLoanModal').hide();
+    toast('Loan disbursed successfully!');
+    await loadLoans();
+  } catch (err) {
+    document.getElementById('disburseErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+function openRepay(id, outstanding) {
+  document.getElementById('repayLoanId').value = id;
+  document.getElementById('repayErr').innerHTML = '';
+  document.getElementById('repayAmt').value = '';
+  document.getElementById('repayAmt').max = outstanding;
+  new bootstrap.Modal('#repayModal').show();
+}
+
+async function submitRepayment(e) {
+  e.preventDefault();
+  document.getElementById('repayErr').innerHTML = '';
+  try {
+    await api('POST', `/loans/${document.getElementById('repayLoanId').value}/repayments`, {
+      amount_ghs: parseFloat(document.getElementById('repayAmt').value),
+      channel: document.getElementById('repayChannel').value,
+      mno_reference: document.getElementById('repayRef').value || null,
+    });
+    bootstrap.Modal.getInstance('#repayModal').hide();
+    toast('Repayment recorded!');
+    await loadLoans();
+  } catch (err) {
+    document.getElementById('repayErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+// ── Savings ───────────────────────────────────────────────────────────────────
+async function loadSavings() {
+  const q = document.getElementById('savSearch')?.value?.trim();
+  let accounts = [];
+  try {
+    if (q) {
+      const custs = await api('GET', `/customers?q=${encodeURIComponent(q)}&page_size=5`);
+      const custItems = custs?.items || [];
+      if (custItems.length > 0) {
+        const results = await Promise.all(custItems.map(c =>
+          api('GET', `/savings?customer_id=${c.id}`).catch(() => [])));
+        accounts = results.flat();
+      } else {
+        try { accounts = [await api('GET', `/savings/${q}`)]; } catch {}
+      }
+    }
+    document.getElementById('savTable').innerHTML = buildTable(
+      ['Account #','Customer ID','Balance','Status','Product','Actions'],
+      accounts.map(a => [
+        `<code class="small">${a.account_number}</code>`,
+        a.customer_id?.slice(0,8)+'…',
+        `<strong>${fmt(a.balance)}</strong>`,
+        badge(a.status),
+        a.product_name || '—',
+        `<div class="d-flex gap-1">
+          <button class="btn btn-xs btn-outline-success" onclick="openSavDeposit('${a.id}')"><i class="bi bi-plus-circle"></i> Deposit</button>
+          <button class="btn btn-xs btn-outline-secondary" onclick="viewStatement('${a.id}')"><i class="bi bi-receipt"></i> Statement</button>
+        </div>`
+      ])
+    );
+    if (!accounts.length) document.getElementById('savTable').innerHTML =
+      '<div class="text-center py-4" style="color:var(--grey);">No accounts found. Enter a customer ID or account number to search.</div>';
+  } catch (err) {
+    toast('Error: ' + err.message, 'danger');
+  }
+}
+
+async function searchSavings() { await loadSavings(); }
+
+function openSavDeposit(id) {
+  document.getElementById('savDepAcctId').value = id;
+  document.getElementById('savDepErr').innerHTML = '';
+  document.getElementById('savDepAmt').value = '';
+  new bootstrap.Modal('#savDepModal').show();
+}
+
+async function submitSavDeposit(e) {
+  e.preventDefault();
+  try {
+    await api('POST', `/savings/${document.getElementById('savDepAcctId').value}/deposit`, {
+      amount_ghs: parseFloat(document.getElementById('savDepAmt').value),
+      channel: document.getElementById('savDepChan').value,
+      narration: document.getElementById('savDepNote').value || null,
+    });
+    bootstrap.Modal.getInstance('#savDepModal').hide();
+    toast('Deposit posted!');
+    await loadSavings();
+  } catch (err) {
+    document.getElementById('savDepErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+async function viewStatement(id) {
+  try {
+    const stmt = await api('GET', `/savings/${id}/statement?page_size=30`);
+    const win = window.open('', '_blank', 'width=900,height=600');
+    win.document.write(`<html><head><title>Statement</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+      </head><body class="p-4">
+      <h5>Account: ${stmt.account_number} | Balance: GHS ${stmt.balance}</h5>
+      <table class="table table-sm table-bordered">
+      <thead><tr><th>Date</th><th>Reference</th><th>Type</th><th>Channel</th><th>Amount</th><th>Balance After</th><th>Notes</th></tr></thead>
+      <tbody>${(stmt.transactions||[]).map(t => `<tr><td>${new Date(t.created_at).toLocaleString()}</td>
+        <td><code>${t.reference||''}</code></td><td>${t.type}</td><td>${t.channel||''}</td>
+        <td class="${t.type.includes('DEPOSIT')||t.type==='INTEREST_CREDIT'?'text-success':'text-danger'} fw-bold">GHS ${parseFloat(t.amount).toFixed(2)}</td>
+        <td>GHS ${parseFloat(t.balance_after).toFixed(2)}</td><td>${t.narration||''}</td></tr>`).join('')}
+      </tbody></table></body></html>`);
+  } catch (err) { toast('Error loading statement: ' + err.message, 'danger'); }
+}
+
+// ── My Commissions ─────────────────────────────────────────────────────────────
+async function loadMyCommissions() {
+  try {
+    const [summary, comms] = await Promise.all([
+      api('GET', '/commissions/my/summary'),
+      api('GET', '/commissions/my'),
+    ]);
+    document.getElementById('mcTotalEarned').textContent = 'GHS ' + parseFloat(summary.total_earned).toFixed(2);
+    document.getElementById('mcPending').textContent = 'GHS ' + parseFloat(summary.total_pending).toFixed(2);
+    document.getElementById('mcPaid').textContent = 'GHS ' + parseFloat(summary.total_paid).toFixed(2);
+
+    if (!(comms||[]).length) {
+      document.getElementById('myCommTable').innerHTML =
+        '<div class="text-center py-5" style="color:var(--grey);">No commissions yet. Commissions accrue from the configured repayment number onwards.</div>';
+      return;
+    }
+    document.getElementById('myCommTable').innerHTML = buildTable(
+      ['Repayment #','Interest Paid','Rate','Your Commission','Status','Date'],
+      comms.map(c => [
+        '#' + c.repayment_number,
+        'GHS ' + parseFloat(c.interest_amount).toFixed(2),
+        (parseFloat(c.commission_rate)*100).toFixed(1) + '%',
+        '<strong>GHS ' + parseFloat(c.commission_amount).toFixed(2) + '</strong>',
+        c.status === 'PAID'
+          ? '<span class="badge bg-success">PAID</span>'
+          : '<span class="badge bg-warning text-dark">PENDING</span>',
+        new Date(c.created_at).toLocaleDateString('en-GH'),
+      ])
+    );
+  } catch (err) { toast('Error: ' + err.message, 'danger'); }
+}
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+async function loadReports() {
+  try {
+    const [overdue, stats] = await Promise.all([
+      api('GET', '/loans?overdue_only=true&page_size=20').catch(() => []),
+      api('GET', '/admin/system/stats').catch(() => null),
+    ]);
+
+    document.getElementById('overdueTable').innerHTML = buildTable(
+      ['Loan #','Customer','Outstanding','Days Past Due'],
+      (overdue||[]).map(l => [
+        `<code>${l.loan_number}</code>`, l.customer_id?.slice(0,8)+'…',
+        `<span class="text-danger fw-bold">${fmt(l.outstanding_ghs)}</span>`,
+        `<span class="badge bg-danger">${l.days_past_due || 0} days</span>`
+      ])
+    );
+
+    if (stats) {
+      document.getElementById('portfolioSummary').innerHTML = `
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="p-3 rounded text-center" style="background:var(--surface2);border:1px solid var(--border);">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold);">${stats.loans.active + stats.loans.disbursed}</div>
+              <small style="color:var(--grey);">Active Loans</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 rounded text-center" style="background:var(--surface2);border:1px solid var(--border);">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#f87171;">${stats.loans.overdue}</div>
+              <small style="color:var(--grey);">Overdue</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 rounded text-center" style="background:var(--surface2);border:1px solid var(--border);">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#4ade80;">${stats.loans.settled}</div>
+              <small style="color:var(--grey);">Settled</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 rounded text-center" style="background:var(--surface2);border:1px solid var(--border);">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#93c5fd;">${stats.savings.active_accounts}</div>
+              <small style="color:var(--grey);">Savings Accounts</small>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="p-3 rounded text-center" style="background:var(--surface2);border:1px solid rgba(231,76,60,0.25);">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#f87171;">${stats.compliance.open_aml_alerts}</div>
+              <small style="color:var(--grey);">Open AML Alerts</small>
+            </div>
+          </div>
+        </div>`;
+    }
+  } catch (err) {
+    toast('Reports error: ' + err.message, 'danger');
+  }
+}
+</script>
+</body>
+</html>

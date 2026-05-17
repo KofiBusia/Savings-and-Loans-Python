@@ -19,6 +19,8 @@ from api.schemas.savings import (
     DepositRequest,
     SavingsAccountCreate,
     SavingsAccountResponse,
+    SavingsProductCreate,
+    SavingsProductResponse,
     SavingsStatementResponse,
     SavingsTransactionResponse,
     WithdrawalRequest,
@@ -68,15 +70,52 @@ def create_savings_account(
     return account
 
 
-@router.get("/{account_id}", response_model=SavingsAccountResponse,
-            summary="Get savings account")
-def get_savings_account(
-    account_id: str,
+# ── Product routes — MUST come before /{account_id} ──────────────────────────
+
+@router.get("/products", response_model=list[SavingsProductResponse],
+            summary="List all savings products (admin)")
+def list_savings_products(
     db: Session = Depends(get_db),
     _: models.User = Depends(get_current_user),
 ):
-    return _get_account_or_404(db, account_id)
+    return db.query(models.SavingsProduct).order_by(models.SavingsProduct.name).all()
 
+
+@router.post("/products", response_model=SavingsProductResponse, status_code=201,
+             summary="Create savings product (admin)")
+def create_savings_product(
+    body: SavingsProductCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_roles("ADMIN", "SUPER_ADMIN")),
+):
+    if db.query(models.SavingsProduct).filter_by(name=body.name).first():
+        raise HTTPException(status_code=409, detail="Product name already exists")
+    product = models.SavingsProduct(
+        name=body.name,
+        description=body.description,
+        interest_rate_pa=body.interest_rate_pa,
+        minimum_balance=body.minimum_balance,
+        minimum_deposit=body.minimum_deposit,
+        lock_period_days=body.lock_period_days,
+        is_active=body.is_active,
+        created_by=current_user.id,
+    )
+    db.add(product)
+    db.commit()
+    write_audit(db, table_name="savings_products", record_id=product.id, action="CREATE",
+                actor_id=current_user.id, data={"name": body.name})
+    return product
+
+
+@router.get("/products/available", response_model=list[SavingsProductResponse],
+            summary="List active savings products (customers)")
+def list_available_savings_products(db: Session = Depends(get_db)):
+    return db.query(models.SavingsProduct).filter_by(is_active=True).order_by(models.SavingsProduct.name).all()
+
+
+# ── Customer self-service routes MUST come before /{account_id} ──────────────
+# FastAPI matches in definition order; /my/* would be caught by /{account_id}
+# if the dynamic route is registered first.
 
 @router.get("/my/accounts", response_model=list[SavingsAccountResponse],
             summary="Customer's savings accounts (mobile)")
@@ -85,6 +124,110 @@ def my_savings(
     current_customer: models.Customer = Depends(get_current_customer),
 ):
     return db.query(models.SavingsAccount).filter_by(customer_id=current_customer.id).all()
+
+
+@router.post("/my/deposit", response_model=SavingsTransactionResponse, status_code=201,
+             summary="Customer self-service deposit via mobile money")
+def customer_deposit(
+    body: DepositRequest,
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(get_current_customer),
+):
+    account = db.query(models.SavingsAccount).filter_by(
+        customer_id=current_customer.id, status="ACTIVE"
+    ).first()
+    if not account:
+        raise HTTPException(status_code=404, detail="No active savings account found")
+
+    txn = _post_transaction(
+        db=db, account=account, txn_type="DEPOSIT",
+        amount=body.amount_ghs, channel=body.channel or "MOBILE_MONEY",
+        mno_reference=body.mno_reference, narration=body.narration,
+        processed_by=current_customer.id,
+    )
+    db.commit()
+    _run_aml(db=db, account=account, txn=txn, actor_id=current_customer.id)
+    write_audit(db, table_name="savings_transactions", record_id=txn.id, action="CUSTOMER_DEPOSIT",
+                actor_id=current_customer.id, data={"amount": str(body.amount_ghs)})
+    return txn
+
+
+@router.post("/my/withdraw", response_model=SavingsTransactionResponse, status_code=201,
+             summary="Customer self-service withdrawal to mobile money")
+def customer_withdraw(
+    body: WithdrawalRequest,
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(get_current_customer),
+):
+    account = db.query(models.SavingsAccount).filter_by(
+        customer_id=current_customer.id, status="ACTIVE"
+    ).first()
+    if not account:
+        raise HTTPException(status_code=404, detail="No active savings account found")
+
+    available = account.balance - account.locked_amount - account.minimum_balance
+    if body.amount_ghs > available:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Insufficient funds. Available: GHS {available:.2f}",
+        )
+
+    txn = _post_transaction(
+        db=db, account=account, txn_type="WITHDRAWAL",
+        amount=body.amount_ghs, channel=body.channel or "MOBILE_MONEY",
+        narration=body.narration, processed_by=current_customer.id,
+    )
+    db.commit()
+    _run_aml(db=db, account=account, txn=txn, actor_id=current_customer.id)
+    write_audit(db, table_name="savings_transactions", record_id=txn.id, action="CUSTOMER_WITHDRAWAL",
+                actor_id=current_customer.id, data={"amount": str(body.amount_ghs)})
+    return txn
+
+
+@router.get("/my/statement", response_model=SavingsStatementResponse,
+            summary="Customer's own account statement")
+def my_statement(
+    from_date: datetime | None = None,
+    to_date: datetime | None = None,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(get_current_customer),
+):
+    account = db.query(models.SavingsAccount).filter_by(
+        customer_id=current_customer.id, status="ACTIVE"
+    ).first()
+    if not account:
+        raise HTTPException(status_code=404, detail="No active savings account found")
+
+    q = db.query(models.SavingsTransaction).filter_by(account_id=account.id)
+    if from_date:
+        q = q.filter(models.SavingsTransaction.created_at >= from_date)
+    if to_date:
+        q = q.filter(models.SavingsTransaction.created_at <= to_date)
+
+    total = q.count()
+    transactions = q.order_by(models.SavingsTransaction.created_at.desc()) \
+        .offset((page - 1) * page_size).limit(page_size).all()
+
+    return SavingsStatementResponse(
+        account_number=account.account_number,
+        balance=account.balance,
+        from_date=from_date,
+        to_date=to_date,
+        total_transactions=total,
+        transactions=transactions,
+    )
+
+
+@router.get("/{account_id}", response_model=SavingsAccountResponse,
+            summary="Get savings account (staff)")
+def get_savings_account(
+    account_id: str,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(get_current_user),
+):
+    return _get_account_or_404(db, account_id)
 
 
 @router.post("/{account_id}/deposit", response_model=SavingsTransactionResponse,

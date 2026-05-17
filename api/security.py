@@ -9,23 +9,24 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Any, Literal
 
+import bcrypt
 import pyotp
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from api.config import settings
 
 # ─── Password Hashing ─────────────────────────────────────────────────────────
+# Uses bcrypt directly — passlib is incompatible with bcrypt >= 4.0.
 
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
+_BCRYPT_ROUNDS = 12
 
 
 def hash_password(password: str) -> str:
-    return _pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=_BCRYPT_ROUNDS)).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return _pwd_context.verify(plain, hashed)
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
 
 def hash_token(token: str) -> str:

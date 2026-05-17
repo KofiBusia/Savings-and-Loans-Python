@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Console — Ghana Savings &amp; Loans</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <style>
+    body { background: var(--dark2); padding-top: 34px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Ticker Bar ── -->
+<div class="ticker-bar">
+  <div class="ticker-label">ADMIN</div>
+  <div class="ticker-track">
+    <div class="ticker-inner">
+      <span class="tick-item"><span class="tick-sym">BOG POLICY RATE</span><span class="tick-val tick-nc">28.0%</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">USD / GHS</span><span class="tick-val tick-dn">15.30</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">EUR / GHS</span><span class="tick-val tick-dn">16.48</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">GBP / GHS</span><span class="tick-val tick-dn">19.42</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AML</span><span class="tick-val tick-nc">Act 1044 · FIC Ghana</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DATA RESIDENCY</span><span class="tick-val tick-nc">Act 843 Enforced</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">CYBERSECURITY</span><span class="tick-val tick-nc">Act 1038 Compliant</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DCD 2025</span><span class="tick-val tick-nc">Simple Interest Enforced</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AUDIT CHAIN</span><span class="tick-val tick-up">Immutable · Active</span></span>
+      <span class="tick-divider">·</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="tick-item"><span class="tick-sym">BOG POLICY RATE</span><span class="tick-val tick-nc">28.0%</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">USD / GHS</span><span class="tick-val tick-dn">15.30</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">EUR / GHS</span><span class="tick-val tick-dn">16.48</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">GBP / GHS</span><span class="tick-val tick-dn">19.42</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AML</span><span class="tick-val tick-nc">Act 1044 · FIC Ghana</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DATA RESIDENCY</span><span class="tick-val tick-nc">Act 843 Enforced</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">CYBERSECURITY</span><span class="tick-val tick-nc">Act 1038 Compliant</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">DCD 2025</span><span class="tick-val tick-nc">Simple Interest Enforced</span></span>
+      <span class="tick-divider">·</span>
+      <span class="tick-item"><span class="tick-sym">AUDIT CHAIN</span><span class="tick-val tick-up">Immutable · Active</span></span>
+      <span class="tick-divider">·</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <a class="brand-logo" href="/admin">
+      <div class="logo-box" style="background:var(--gold);color:var(--dark);"><i class="bi bi-shield-lock"></i></div>
+      <div class="logo-text">
+        <strong>Ghana S&amp;L</strong>
+        <small>Admin Console</small>
+      </div>
+    </a>
+  </div>
+
+  <ul class="sidebar-nav nav flex-column mt-1">
+    <li class="nav-item"><a class="nav-link" href="#dashboard"  data-section="dashboard"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link" href="#users"      data-section="users"><i class="bi bi-person-badge"></i>Staff Users</a></li>
+    <li class="nav-item"><a class="nav-link" href="#products"        data-section="products"><i class="bi bi-tag"></i>Loan Products</a></li>
+    <li class="nav-item"><a class="nav-link" href="#savingsproducts" data-section="savingsproducts"><i class="bi bi-piggy-bank"></i>Savings Products</a></li>
+    <li class="nav-item"><a class="nav-link" href="#commissions" data-section="commissions"><i class="bi bi-percent"></i>Commissions</a></li>
+    <li class="nav-item"><a class="nav-link" href="#customers"       data-section="customers"><i class="bi bi-people"></i>All Customers</a></li>
+    <li class="nav-item"><a class="nav-link" href="#loans"      data-section="loans"><i class="bi bi-cash-coin"></i>All Loans</a></li>
+    <li class="nav-item"><a class="nav-link" href="#compliance" data-section="compliance"><i class="bi bi-shield-exclamation"></i>Compliance</a></li>
+    <li class="nav-item"><a class="nav-link" href="#system"     data-section="system"><i class="bi bi-gear"></i>System</a></li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <div class="mb-2" style="font-size:0.72rem;color:var(--grey);" id="sidebarUser">Loading…</div>
+    <div class="d-flex gap-2">
+      <a href="/staff" class="btn btn-outline-light btn-sm flex-fill"><i class="bi bi-grid me-1"></i>Staff View</a>
+      <button class="btn btn-outline-danger btn-sm flex-fill" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>Out</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Main content ── -->
+<div class="main-content">
+
+  <!-- ══════════════ DASHBOARD ══════════════ -->
+  <div id="sec-dashboard">
+    <div class="section-title">System Overview</div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-people"></i></div>
+          <div><div class="stat-value" id="sc-cust">—</div><div class="stat-label">Total Customers</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-cash-coin"></i></div>
+          <div><div class="stat-value" id="sc-loans">—</div><div class="stat-label">Total Loans</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="bi bi-piggy-bank"></i></div>
+          <div><div class="stat-value" id="sc-sav">—</div><div class="stat-label">Savings Accounts</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="bi bi-exclamation-shield"></i></div>
+          <div><div class="stat-value" id="sc-aml">—</div><div class="stat-label">Open AML Alerts</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-check-circle"></i></div>
+          <div><div class="stat-value" id="sc-active">—</div><div class="stat-label">Active Loans</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="bi bi-clock-history"></i></div>
+          <div><div class="stat-value" id="sc-overdue">—</div><div class="stat-label">Overdue Loans</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-check-all"></i></div>
+          <div><div class="stat-value" id="sc-settled">—</div><div class="stat-label">Settled Loans</div></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="bi bi-person-badge"></i></div>
+          <div><div class="stat-value" id="sc-staff">—</div><div class="stat-label">Active Staff</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-activity me-2" style="color:var(--gold);"></i>System Health</span>
+        <button class="btn btn-sm btn-outline-secondary" onclick="loadHealth()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+      </div>
+      <div class="card-body" id="healthPanel">
+        <div class="text-center py-3" style="color:var(--grey);">Click Refresh to load health status</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ STAFF USERS ══════════════ -->
+  <div id="sec-users" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0">Staff User Management</div>
+      <button class="btn btn-gsl" data-bs-toggle="modal" data-bs-target="#createUserModal">
+        <i class="bi bi-person-plus me-1"></i>Create Staff User
+      </button>
+    </div>
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-3">
+            <select id="userRoleFilter" class="form-select" onchange="loadUsers()">
+              <option value="">All Roles</option>
+              <option>SUPER_ADMIN</option><option>ADMIN</option><option>FIELD_OFFICER</option>
+              <option>CREDIT_MANAGER</option><option>COMPLIANCE_OFFICER</option>
+              <option>TELLER</option><option>AUDIT_VIEWER</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="userActiveFilter" class="form-select" onchange="loadUsers()">
+              <option value="">All Status</option>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+          <div class="col-auto"><button class="btn btn-gsl" onclick="loadUsers()"><i class="bi bi-search me-1"></i>Filter</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body p-0" id="usersTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ LOAN PRODUCTS ══════════════ -->
+  <div id="sec-products" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0">Loan Products</div>
+      <button class="btn btn-gsl" data-bs-toggle="modal" data-bs-target="#createProductModal">
+        <i class="bi bi-plus-circle me-1"></i>New Product
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-body p-0" id="productsTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SAVINGS PRODUCTS ══════════════ -->
+  <div id="sec-savingsproducts" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0">Savings Products</div>
+      <button class="btn btn-gsl" data-bs-toggle="modal" data-bs-target="#createSavingsProductModal">
+        <i class="bi bi-plus-circle me-1"></i>New Savings Product
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-body p-0" id="savingsProductsTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ALL CUSTOMERS ══════════════ -->
+  <div id="sec-customers" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0">All Customers</div>
+      <button class="btn btn-gsl position-relative" onclick="loadPendingKYC()">
+        <i class="bi bi-person-check me-1"></i>Pending KYC
+        <span id="kycBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;font-size:0.65rem;"></span>
+      </button>
+    </div>
+
+    <!-- KYC Pending Panel -->
+    <div id="kycPendingPanel" class="d-none mb-4">
+      <div class="card" style="border:1px solid rgba(201,168,76,0.4);">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background:rgba(201,168,76,0.08);">
+          <span><i class="bi bi-person-check me-2" style="color:var(--gold);"></i><strong>Pending KYC Review</strong></span>
+          <button class="btn btn-xs btn-outline-secondary" onclick="document.getElementById('kycPendingPanel').classList.add('d-none')">
+            <i class="bi bi-x"></i> Close
+          </button>
+        </div>
+        <div class="card-body p-0" id="kycPendingTable">
+          <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4"><input type="text" id="adCustSearch" class="form-control" placeholder="Search name, phone, account…"></div>
+          <div class="col-md-2">
+            <select id="adCustKYC" class="form-select">
+              <option value="">All KYC</option>
+              <option>PENDING_GHANA_CARD</option>
+              <option>PENDING_REVIEW</option>
+              <option>ACTIVE</option>
+              <option>REJECTED</option>
+            </select>
+          </div>
+          <div class="col-auto"><button class="btn btn-gsl" onclick="loadAdminCustomers()"><i class="bi bi-search me-1"></i>Search</button></div>
+          <div class="col-auto"><button class="btn btn-outline-secondary" onclick="loadAdminCustomers(true)">All</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body p-0" id="adCustTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ALL LOANS ══════════════ -->
+  <div id="sec-loans" class="d-none">
+    <div class="section-title">All Loans</div>
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <div class="row g-2">
+          <div class="col-md-3">
+            <select id="adLoanStatus" class="form-select" onchange="loadAdminLoans()">
+              <option value="">All Status</option>
+              <option>APPLICATION</option><option>APPROVED</option><option>DISBURSED</option>
+              <option>ACTIVE</option><option>OVERDUE</option><option>SETTLED</option><option>REJECTED</option>
+            </select>
+          </div>
+          <div class="col-auto"><button class="btn btn-gsl" onclick="loadAdminLoans()">Filter</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body p-0" id="adLoanTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ COMPLIANCE ══════════════ -->
+  <div id="sec-compliance" class="d-none">
+    <div class="section-title">Compliance &amp; AML</div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+          <div><div class="stat-value" id="aml-open">—</div><div class="stat-label">Open Alerts</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="bi bi-search"></i></div>
+          <div><div class="stat-value" id="aml-review">—</div><div class="stat-label">Under Review</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-shield-check"></i></div>
+          <div><div class="stat-value" id="aml-filed">—</div><div class="stat-label">Filed (CTR/STR)</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-shield-exclamation me-2" style="color:#f87171;"></i>AML Alerts</span>
+            <select id="amlFilter" class="form-select form-select-sm w-auto" onchange="loadAMLAlerts()">
+              <option value="">All</option><option>OPEN</option><option>UNDER_REVIEW</option>
+              <option>FILED_CTR</option><option>FILED_STR</option><option>DISMISSED</option>
+            </select>
+          </div>
+          <div class="card-body p-0" id="amlTable">
+            <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header"><i class="bi bi-link-45deg me-2" style="color:var(--gold);"></i>Audit Chain</div>
+          <div class="card-body">
+            <p style="font-size:0.78rem;color:var(--grey);">Verify the integrity of the immutable audit log chain.</p>
+            <button class="btn btn-outline-secondary w-100 mb-3" onclick="verifyAuditChain()">
+              <i class="bi bi-shield-check me-1"></i>Verify Chain
+            </button>
+            <div id="chainResult"></div>
+            <hr>
+            <h6 class="fw-semibold" style="font-size:0.82rem;margin-bottom:0.75rem;">Recent Audit Logs</h6>
+            <div id="auditLogList" style="font-size:0.78rem;color:var(--grey);">Click to load…</div>
+            <button class="btn btn-sm btn-outline-secondary w-100 mt-2" onclick="loadAuditLogs()">Load Logs</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ COMMISSIONS ══════════════ -->
+  <div id="sec-commissions" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0">Commission Management</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-gsl" data-bs-toggle="modal" data-bs-target="#commPolicyModal">
+          <i class="bi bi-sliders me-1"></i>Set Policy
+        </button>
+      </div>
+    </div>
+
+    <!-- Policy card -->
+    <div class="card mb-4" id="commPolicyCard">
+      <div class="card-header"><i class="bi bi-sliders me-2" style="color:var(--gold);"></i><strong>Active Commission Policy</strong></div>
+      <div class="card-body" id="commPolicyBody">
+        <div class="text-center py-3" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Officer summaries -->
+    <div class="section-title mb-3" style="font-size:1rem;">Officer Commission Summary</div>
+    <div class="card mb-4">
+      <div class="card-body p-0" id="commSummaryTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Assign officer panel -->
+    <div class="section-title mb-3" style="font-size:1rem;">Assign Loan Officers to Customers</div>
+    <div class="card mb-4">
+      <div class="card-body py-2">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4"><input type="text" id="assignCustSearch" class="form-control" placeholder="Search customer name / account…" oninput="searchCustomersForAssign()"></div>
+        </div>
+      </div>
+      <div class="card-body p-0" id="assignTable">
+        <div class="text-center py-4" style="color:var(--grey);">Search for a customer above to assign an officer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SYSTEM ══════════════ -->
+  <div id="sec-system" class="d-none">
+    <div class="section-title">System Settings</div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header"><i class="bi bi-info-circle me-2" style="color:var(--gold);"></i>System Information</div>
+          <div class="card-body" id="sysInfo">
+            <div class="text-center py-3" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header"><i class="bi bi-activity me-2" style="color:var(--gold);"></i>API Health</div>
+          <div class="card-body" id="sysHealth">
+            <div class="text-center py-3" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- ── Create Staff User Modal ── -->
+<div class="modal fade" id="createUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-plus me-2" style="color:var(--gold);"></i>Create Staff User</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="createUser(event)">
+        <div class="modal-body">
+          <div id="cuErr"></div>
+          <div class="alert alert-info" style="font-size:0.78rem;">Creating a staff user requires MFA. Enter your current 6-digit code.</div>
+          <div class="mb-3">
+            <label class="form-label">Your MFA Code *</label>
+            <input type="text" id="cuMFA" class="form-control" maxlength="6" pattern="\d{6}" inputmode="numeric" required>
+          </div>
+          <div class="mb-3"><label class="form-label">Full Name *</label><input type="text" id="cuName" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Email *</label><input type="email" id="cuEmail" class="form-control" required></div>
+          <div class="mb-3">
+            <label class="form-label">Initial Password *</label>
+            <input type="password" id="cuPass" class="form-control" minlength="8" placeholder="Min 8 chars with uppercase, digit, symbol" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Roles *</label>
+            <div class="row g-2">
+              <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" value="FIELD_OFFICER" id="r1"><label class="form-check-label" for="r1">Field Officer</label></div></div>
+              <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" value="TELLER" id="r2"><label class="form-check-label" for="r2">Teller</label></div></div>
+              <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" value="CREDIT_MANAGER" id="r3"><label class="form-check-label" for="r3">Credit Manager</label></div></div>
+              <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" value="COMPLIANCE_OFFICER" id="r4"><label class="form-check-label" for="r4">Compliance Officer</label></div></div>
+              <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" value="ADMIN" id="r5"><label class="form-check-label" for="r5">Admin</label></div></div>
+              <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" value="AUDIT_VIEWER" id="r6"><label class="form-check-label" for="r6">Audit Viewer</label></div></div>
+              <div class="col-6"><div class="form-check"><input class="form-check-input" type="checkbox" value="SUPER_ADMIN" id="r7"><label class="form-check-label" for="r7">Super Admin</label></div></div>
+            </div>
+          </div>
+          <div class="mb-3"><label class="form-label">Branch Code</label><input type="text" id="cuBranch" class="form-control" placeholder="e.g. ACC-01"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-person-check me-1"></i>Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Create Loan Product Modal ── -->
+<div class="modal fade" id="createProductModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-tag me-2" style="color:var(--gold);"></i>Create Loan Product</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="createProduct(event)">
+        <div class="modal-body">
+          <div id="cpErr"></div>
+          <div class="mb-3"><label class="form-label">Product Name *</label><input type="text" id="cpName" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea id="cpDesc" class="form-control" rows="2"></textarea></div>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Annual Interest Rate *</label>
+              <div class="input-group">
+                <input type="number" id="cpRate" class="form-control" step="0.001" min="0" max="1" placeholder="e.g. 0.24" required>
+                <span class="input-group-text">decimal</span>
+              </div>
+              <div class="form-text">Enter as decimal: 0.24 = 24% p.a.</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Processing Fee %</label>
+              <div class="input-group"><input type="number" id="cpProcFee" class="form-control" step="0.001" value="0.02"><span class="input-group-text">decimal</span></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Insurance Fee %</label>
+              <div class="input-group"><input type="number" id="cpInsFee" class="form-control" step="0.001" value="0.01"><span class="input-group-text">decimal</span></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Late Payment Fee %</label>
+              <div class="input-group"><input type="number" id="cpLateFee" class="form-control" step="0.001" value="0.05"><span class="input-group-text">decimal</span></div>
+            </div>
+            <div class="col-6"><label class="form-label">Min Amount (GHS) *</label><input type="number" id="cpMinAmt" class="form-control" value="500" required></div>
+            <div class="col-6"><label class="form-label">Max Amount (GHS) *</label><input type="number" id="cpMaxAmt" class="form-control" value="50000" required></div>
+            <div class="col-6"><label class="form-label">Min Tenure (months) *</label><input type="number" id="cpMinT" class="form-control" value="1" required></div>
+            <div class="col-6"><label class="form-label">Max Tenure (months) *</label><input type="number" id="cpMaxT" class="form-control" value="24" required></div>
+            <div class="col-6">
+              <label class="form-label">Savings-based Limit <small style="color:var(--grey);">(fraction of balance)</small></label>
+              <div class="input-group">
+                <input type="number" id="cpSavingsRatio" class="form-control" step="0.01" min="0.01" max="1" value="0.70" required>
+                <span class="input-group-text">ratio</span>
+              </div>
+              <div class="form-text">e.g. 0.70 → customer with GHS 100k can borrow GHS 70k</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Collateral-based Limit <small style="color:var(--grey);">(fraction of value)</small></label>
+              <div class="input-group">
+                <input type="number" id="cpCollateralRatio" class="form-control" step="0.01" min="0.01" max="1" value="0.50" required>
+                <span class="input-group-text">ratio</span>
+              </div>
+              <div class="form-text">e.g. 0.50 → collateral worth GHS 200k → max GHS 100k</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-check-circle me-1"></i>Create Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Create Savings Product Modal ── -->
+<div class="modal fade" id="createSavingsProductModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-piggy-bank me-2" style="color:var(--gold);"></i>Create Savings Product</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="createSavingsProduct(event)">
+        <div class="modal-body">
+          <div id="cspErr"></div>
+          <div class="mb-3"><label class="form-label">Product Name *</label><input type="text" id="cspName" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea id="cspDesc" class="form-control" rows="2"></textarea></div>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Interest Rate p.a. *</label>
+              <div class="input-group">
+                <input type="number" id="cspRate" class="form-control" step="0.001" min="0" max="0.5" placeholder="e.g. 0.08" required>
+                <span class="input-group-text">decimal</span>
+              </div>
+              <div class="form-text">0.08 = 8% p.a.</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Min Balance (GHS)</label>
+              <input type="number" id="cspMinBal" class="form-control" step="0.01" value="0" min="0">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Min Opening Deposit (GHS)</label>
+              <input type="number" id="cspMinDep" class="form-control" step="0.01" value="0" min="0">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Lock Period (days)</label>
+              <input type="number" id="cspLock" class="form-control" value="0" min="0">
+              <div class="form-text">0 = no lock</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-check-circle me-1"></i>Create Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Edit User Modal ── -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Staff User</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="updateUser(event)">
+        <div class="modal-body">
+          <div id="euErr"></div>
+          <input type="hidden" id="euUserId">
+          <div class="mb-3"><label class="form-label">Your MFA Code *</label><input type="text" id="euMFA" class="form-control" maxlength="6" pattern="\d{6}" inputmode="numeric" required></div>
+          <div class="mb-3"><label class="form-label">Full Name</label><input type="text" id="euName" class="form-control"></div>
+          <div class="mb-3">
+            <label class="form-label">Active</label>
+            <select id="euActive" class="form-select"><option value="true">Active</option><option value="false">Inactive</option></select>
+          </div>
+          <div class="mb-3"><label class="form-label">Branch Code</label><input type="text" id="euBranch" class="form-control"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Commission Policy Modal ── -->
+<div class="modal fade" id="commPolicyModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-percent me-2" style="color:var(--gold);"></i>Commission Policy</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="saveCommPolicy(event)">
+        <div class="modal-body">
+          <div id="commPolicyErr"></div>
+          <div class="mb-3">
+            <label class="form-label">Policy Name</label>
+            <input type="text" id="cpolicyName" class="form-control" value="Default Policy" required>
+          </div>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Commission Rate *</label>
+              <div class="input-group">
+                <input type="number" id="cpolicyRate" class="form-control" step="0.001" min="0.001" max="0.5" placeholder="e.g. 0.05" required>
+                <span class="input-group-text">decimal</span>
+              </div>
+              <div class="form-text">0.05 = 5% of interest collected</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Trigger from Repayment # *</label>
+              <input type="number" id="cpolicyTrigger" class="form-control" value="6" min="1" max="36" required>
+              <div class="form-text">Commission accrues from this repayment onwards</div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">Apply to Loan Product (optional)</label>
+            <select id="cpolicyProduct" class="form-select">
+              <option value="">All products (global default)</option>
+            </select>
+            <div class="form-text">Leave blank to apply to all loan products</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-check-circle me-1"></i>Save Policy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Edit Loan Product Modal ── -->
+<div class="modal fade" id="editProductModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-tag me-2" style="color:var(--gold);"></i>Edit Loan Product Rates</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="updateProduct(event)">
+        <div class="modal-body">
+          <div id="epErr"></div>
+          <input type="hidden" id="epId">
+          <div class="mb-3"><label class="form-label">Product Name *</label><input type="text" id="epName" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea id="epDesc" class="form-control" rows="2"></textarea></div>
+          <div class="alert alert-info py-2" style="font-size:0.8rem;">
+            <i class="bi bi-info-circle me-1"></i>
+            Interest rate changes apply to <strong>new loans only</strong>. Existing disbursed loans retain their original rate (DCD 2025 Clause 14).
+          </div>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Annual Interest Rate *</label>
+              <div class="input-group">
+                <input type="number" id="epRate" class="form-control" step="0.001" min="0.001" max="0.6" required>
+                <span class="input-group-text">decimal</span>
+              </div>
+              <div class="form-text">0.24 = 24% p.a. (BoG cap: 60%)</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Processing Fee %</label>
+              <div class="input-group"><input type="number" id="epProcFee" class="form-control" step="0.001" min="0" max="0.1"><span class="input-group-text">decimal</span></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Insurance Fee %</label>
+              <div class="input-group"><input type="number" id="epInsFee" class="form-control" step="0.001" min="0" max="0.05"><span class="input-group-text">decimal</span></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Late Payment Fee % / month</label>
+              <div class="input-group"><input type="number" id="epLateFee" class="form-control" step="0.001" min="0" max="0.05"><span class="input-group-text">decimal</span></div>
+            </div>
+            <div class="col-6"><label class="form-label">Min Amount (GHS) *</label><input type="number" id="epMinAmt" class="form-control" required></div>
+            <div class="col-6"><label class="form-label">Max Amount (GHS) *</label><input type="number" id="epMaxAmt" class="form-control" required></div>
+            <div class="col-6"><label class="form-label">Min Tenure (months) *</label><input type="number" id="epMinT" class="form-control" required></div>
+            <div class="col-6"><label class="form-label">Max Tenure (months) *</label><input type="number" id="epMaxT" class="form-control" required></div>
+            <div class="col-6">
+              <label class="form-label">Savings-based Limit (ratio)</label>
+              <div class="input-group"><input type="number" id="epSavingsRatio" class="form-control" step="0.01" min="0.01" max="1"><span class="input-group-text">ratio</span></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Collateral-based Limit (ratio)</label>
+              <div class="input-group"><input type="number" id="epCollateralRatio" class="form-control" step="0.01" min="0.01" max="1"><span class="input-group-text">ratio</span></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Status</label>
+              <select id="epActive" class="form-select">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-check-circle me-1"></i>Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+'use strict';
+if (!requireAuth('staff')) throw new Error('not authenticated');
+if (!Auth.isAdmin()) { location.href = '/staff'; throw new Error('not admin'); }
+
+const SECTIONS = ['dashboard','users','products','savingsproducts','commissions','customers','loans','compliance','system'];
+initNav(SECTIONS, 'dashboard', loadSection);
+
+async function loadSection(sec) {
+  if (sec === 'dashboard')  await loadDashboard();
+  if (sec === 'users')      await loadUsers();
+  if (sec === 'products')        await loadProducts();
+  if (sec === 'savingsproducts') await loadSavingsProducts();
+  if (sec === 'commissions') await loadCommissions();
+  if (sec === 'customers')  { await loadAdminCustomers(true); _loadKYCBadge(); }
+  if (sec === 'loans')      await loadAdminLoans();
+  if (sec === 'compliance') await loadCompliance();
+  if (sec === 'system')     await loadSystem();
+}
+
+(async () => {
+  try {
+    const me = await api('GET', '/auth/me');
+    document.getElementById('sidebarUser').textContent = `${me.full_name || me.email}`;
+  } catch {}
+})();
+
+// ── Dashboard ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const s = await api('GET', '/admin/system/stats');
+    document.getElementById('sc-cust').textContent    = s.customers.total;
+    document.getElementById('sc-loans').textContent   = s.loans.total;
+    document.getElementById('sc-sav').textContent     = s.savings.total_accounts;
+    document.getElementById('sc-aml').textContent     = s.compliance.open_aml_alerts;
+    document.getElementById('sc-active').textContent  = s.loans.active + s.loans.disbursed;
+    document.getElementById('sc-overdue').textContent = s.loans.overdue;
+    document.getElementById('sc-settled').textContent = s.loans.settled;
+    document.getElementById('sc-staff').textContent   = s.staff.active;
+    await loadHealth();
+  } catch (err) {
+    toast('Dashboard error: ' + err.message, 'danger');
+  }
+}
+
+async function loadHealth() {
+  try {
+    const h = await api('GET', '/health');
+    document.getElementById('healthPanel').innerHTML = `
+      <div class="row g-3">
+        <div class="col-6 col-md-3 text-center">
+          <div style="font-size:2.5rem;font-family:'Cormorant Garamond',serif;color:${h.status==='healthy'?'#4ade80':'#f87171'};">
+            <i class="bi bi-${h.status==='healthy'?'check-circle-fill':'x-circle-fill'}"></i>
+          </div>
+          <div class="fw-semibold mt-1" style="font-size:0.82rem;">${h.status?.toUpperCase()}</div>
+          <small style="color:var(--grey);font-size:0.7rem;">System Status</small>
+        </div>
+        <div class="col-6 col-md-3 text-center">
+          <div style="font-size:2.5rem;font-family:'Cormorant Garamond',serif;color:${h.components?.database==='up'?'#4ade80':'#f87171'};">
+            <i class="bi bi-database-fill"></i>
+          </div>
+          <div class="fw-semibold mt-1" style="font-size:0.82rem;">${h.components?.database?.toUpperCase()||'—'}</div>
+          <small style="color:var(--grey);font-size:0.7rem;">Database</small>
+        </div>
+        <div class="col-6 col-md-3 text-center">
+          <div style="font-size:2.5rem;font-family:'Cormorant Garamond',serif;color:var(--gold);">
+            <i class="bi bi-info-circle-fill"></i>
+          </div>
+          <div class="fw-semibold mt-1" style="font-size:0.82rem;">${h.version||'—'}</div>
+          <small style="color:var(--grey);font-size:0.7rem;">Version</small>
+        </div>
+        <div class="col-6 col-md-3 text-center">
+          <div style="font-size:2.5rem;font-family:'Cormorant Garamond',serif;color:var(--grey);">
+            <i class="bi bi-clock-fill"></i>
+          </div>
+          <div class="fw-semibold mt-1" style="font-size:0.82rem;">${fmtDT(h.timestamp)}</div>
+          <small style="color:var(--grey);font-size:0.7rem;">Last Check</small>
+        </div>
+      </div>`;
+  } catch (err) {
+    document.getElementById('healthPanel').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+// ── Users ─────────────────────────────────────────────────────────────────────
+async function loadUsers() {
+  const role   = document.getElementById('userRoleFilter')?.value;
+  const active = document.getElementById('userActiveFilter')?.value;
+  let url = '/admin/users?page_size=50';
+  if (role)   url += `&role=${role}`;
+  if (active) url += `&is_active=${active}`;
+  try {
+    const users = await api('GET', url);
+    document.getElementById('usersTable').innerHTML = buildTable(
+      ['Name','Email','Roles','Branch','Status','Last Login','Actions'],
+      (users||[]).map(u => [
+        u.full_name || '—',
+        u.email,
+        (u.roles||[]).map(r => `<span class="badge bg-secondary me-1">${r}</span>`).join(''),
+        u.branch_code || '—',
+        u.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>',
+        fmtD(u.last_login_at),
+        `<button class="btn btn-xs btn-outline-primary" onclick="openEditUser('${u.id}','${u.full_name||''}','${u.is_active}','${u.branch_code||''}')">
+          <i class="bi bi-pencil"></i> Edit
+        </button>`
+      ])
+    );
+  } catch (err) {
+    toast('Error loading users: ' + err.message, 'danger');
+  }
+}
+
+async function createUser(e) {
+  e.preventDefault();
+  document.getElementById('cuErr').innerHTML = '';
+  const roles = Array.from(document.querySelectorAll('#createUserModal input[type=checkbox]:checked')).map(cb => cb.value);
+  if (!roles.length) { document.getElementById('cuErr').innerHTML = '<div class="alert alert-warning">Select at least one role</div>'; return; }
+  const mfa = document.getElementById('cuMFA').value;
+  try {
+    const headers = mfa ? { 'X-MFA-Token': mfa } : {};
+    await api('POST', '/admin/users', {
+      full_name:   document.getElementById('cuName').value,
+      email:       document.getElementById('cuEmail').value,
+      password:    document.getElementById('cuPass').value,
+      roles,
+      branch_code: document.getElementById('cuBranch').value || null,
+    }, { headers });
+    bootstrap.Modal.getInstance('#createUserModal').hide();
+    document.getElementById('cuMFA').value = '';
+    toast('Staff user created!');
+    await loadUsers();
+  } catch (err) {
+    document.getElementById('cuErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+function openEditUser(id, name, active, branch) {
+  document.getElementById('euUserId').value  = id;
+  document.getElementById('euName').value    = name;
+  document.getElementById('euActive').value  = active;
+  document.getElementById('euBranch').value  = branch;
+  document.getElementById('euErr').innerHTML = '';
+  document.getElementById('euMFA').value     = '';
+  new bootstrap.Modal('#editUserModal').show();
+}
+
+async function updateUser(e) {
+  e.preventDefault();
+  const mfa = document.getElementById('euMFA').value;
+  try {
+    const headers = mfa ? { 'X-MFA-Token': mfa } : {};
+    await api('PATCH', `/admin/users/${document.getElementById('euUserId').value}`, {
+      full_name:   document.getElementById('euName').value || null,
+      is_active:   document.getElementById('euActive').value === 'true',
+      branch_code: document.getElementById('euBranch').value || null,
+    }, { headers });
+    bootstrap.Modal.getInstance('#editUserModal').hide();
+    toast('User updated!');
+    await loadUsers();
+  } catch (err) {
+    document.getElementById('euErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+// ── Savings Products ──────────────────────────────────────────────────────────
+async function loadSavingsProducts() {
+  try {
+    const products = await api('GET', '/savings/products');
+    document.getElementById('savingsProductsTable').innerHTML = buildTable(
+      ['Name','Interest Rate p.a.','Min Balance','Min Deposit','Lock Period','Status'],
+      (products||[]).map(p => [
+        `<strong>${p.name}</strong>${p.description ? '<br><small style="color:var(--grey);">'+p.description+'</small>' : ''}`,
+        (parseFloat(p.interest_rate_pa)*100).toFixed(2) + '%',
+        'GHS ' + parseFloat(p.minimum_balance).toFixed(2),
+        'GHS ' + parseFloat(p.minimum_deposit).toFixed(2),
+        p.lock_period_days > 0 ? p.lock_period_days + ' days' : 'None',
+        p.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>',
+      ])
+    );
+    if (!(products||[]).length) {
+      document.getElementById('savingsProductsTable').innerHTML =
+        '<div class="text-center py-5" style="color:var(--grey);"><p>No savings products yet.</p><p>Click "New Savings Product" to create one.</p></div>';
+    }
+  } catch (err) { toast('Error: ' + err.message, 'danger'); }
+}
+
+async function createSavingsProduct(e) {
+  e.preventDefault();
+  document.getElementById('cspErr').innerHTML = '';
+  try {
+    await api('POST', '/savings/products', {
+      name:             document.getElementById('cspName').value,
+      description:      document.getElementById('cspDesc').value || null,
+      interest_rate_pa: parseFloat(document.getElementById('cspRate').value),
+      minimum_balance:  parseFloat(document.getElementById('cspMinBal').value) || 0,
+      minimum_deposit:  parseFloat(document.getElementById('cspMinDep').value) || 0,
+      lock_period_days: parseInt(document.getElementById('cspLock').value) || 0,
+    });
+    bootstrap.Modal.getInstance('#createSavingsProductModal').hide();
+    e.target.reset();
+    toast('Savings product created!');
+    await loadSavingsProducts();
+  } catch (err) {
+    document.getElementById('cspErr').innerHTML =
+      `<div class="alert alert-danger py-2 mb-3">${err.message}</div>`;
+  }
+}
+
+// ── Loan Products ─────────────────────────────────────────────────────────────
+async function loadProducts() {
+  try {
+    const products = await api('GET', '/loans/products?active_only=false');
+    document.getElementById('productsTable').innerHTML = buildTable(
+      ['Name','Interest Rate p.a.','Processing Fee','Insurance','Min Amount','Max Amount','Min/Max Tenure','Savings Ratio','Collateral Ratio','Status','Actions'],
+      (products||[]).map(p => [
+        `<strong>${p.name}</strong>${p.description?`<div style="font-size:0.72rem;color:var(--grey);">${p.description}</div>`:''}`,
+        `<strong style="color:var(--gold);">${(parseFloat(p.annual_interest_rate)*100).toFixed(1)}%</strong>`,
+        `${(parseFloat(p.processing_fee_pct||0)*100).toFixed(1)}%`,
+        `${(parseFloat(p.insurance_fee_pct||0)*100).toFixed(1)}%`,
+        fmt(p.min_amount_ghs),
+        fmt(p.max_amount_ghs),
+        `${p.min_tenure_months}–${p.max_tenure_months} months`,
+        `${(parseFloat(p.savings_ratio)*100).toFixed(0)}%`,
+        `${(parseFloat(p.collateral_ratio)*100).toFixed(0)}%`,
+        p.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>',
+        `<button class="btn btn-xs btn-outline-primary" onclick='openEditProduct(${JSON.stringify(p)})'>
+           <i class="bi bi-pencil"></i> Edit Rates
+         </button>`
+      ])
+    );
+    if (!(products||[]).length) {
+      document.getElementById('productsTable').innerHTML =
+        '<div class="text-center py-5" style="color:var(--grey);"><p>No loan products yet.</p><p>Click "New Product" to create one.</p></div>';
+    }
+  } catch (err) { toast('Error: ' + err.message, 'danger'); }
+}
+
+function openEditProduct(p) {
+  document.getElementById('epId').value              = p.id;
+  document.getElementById('epName').value            = p.name;
+  document.getElementById('epDesc').value            = p.description || '';
+  document.getElementById('epRate').value            = p.annual_interest_rate;
+  document.getElementById('epProcFee').value         = p.processing_fee_pct;
+  document.getElementById('epInsFee').value          = p.insurance_fee_pct;
+  document.getElementById('epLateFee').value         = p.late_payment_fee_pct;
+  document.getElementById('epMinAmt').value          = p.min_amount_ghs;
+  document.getElementById('epMaxAmt').value          = p.max_amount_ghs;
+  document.getElementById('epMinT').value            = p.min_tenure_months;
+  document.getElementById('epMaxT').value            = p.max_tenure_months;
+  document.getElementById('epSavingsRatio').value    = p.savings_ratio;
+  document.getElementById('epCollateralRatio').value = p.collateral_ratio;
+  document.getElementById('epActive').value          = String(p.is_active);
+  document.getElementById('epErr').innerHTML         = '';
+  new bootstrap.Modal('#editProductModal').show();
+}
+
+async function updateProduct(e) {
+  e.preventDefault();
+  document.getElementById('epErr').innerHTML = '';
+  const id = document.getElementById('epId').value;
+  try {
+    await api('PATCH', `/loans/products/${id}`, {
+      name:                 document.getElementById('epName').value || null,
+      description:          document.getElementById('epDesc').value || null,
+      annual_interest_rate: parseFloat(document.getElementById('epRate').value),
+      processing_fee_pct:   parseFloat(document.getElementById('epProcFee').value),
+      insurance_fee_pct:    parseFloat(document.getElementById('epInsFee').value),
+      late_payment_fee_pct: parseFloat(document.getElementById('epLateFee').value),
+      min_amount_ghs:       parseFloat(document.getElementById('epMinAmt').value),
+      max_amount_ghs:       parseFloat(document.getElementById('epMaxAmt').value),
+      min_tenure_months:    parseInt(document.getElementById('epMinT').value),
+      max_tenure_months:    parseInt(document.getElementById('epMaxT').value),
+      savings_ratio:        parseFloat(document.getElementById('epSavingsRatio').value),
+      collateral_ratio:     parseFloat(document.getElementById('epCollateralRatio').value),
+      is_active:            document.getElementById('epActive').value === 'true',
+    });
+    bootstrap.Modal.getInstance('#editProductModal').hide();
+    toast('Loan product updated!', 'success');
+    await loadProducts();
+  } catch (err) {
+    document.getElementById('epErr').innerHTML = `<div class="alert alert-danger py-2 mb-3">${err.message}</div>`;
+  }
+}
+
+async function createProduct(e) {
+  e.preventDefault();
+  document.getElementById('cpErr').innerHTML = '';
+  try {
+    await api('POST', '/loans/products', {
+      name:                  document.getElementById('cpName').value,
+      description:           document.getElementById('cpDesc').value || null,
+      annual_interest_rate:  parseFloat(document.getElementById('cpRate').value),
+      processing_fee_pct:    parseFloat(document.getElementById('cpProcFee').value || 0),
+      insurance_fee_pct:     parseFloat(document.getElementById('cpInsFee').value || 0),
+      late_payment_fee_pct:  parseFloat(document.getElementById('cpLateFee').value || 0),
+      min_amount_ghs:        parseFloat(document.getElementById('cpMinAmt').value),
+      max_amount_ghs:        parseFloat(document.getElementById('cpMaxAmt').value),
+      min_tenure_months:     parseInt(document.getElementById('cpMinT').value),
+      max_tenure_months:     parseInt(document.getElementById('cpMaxT').value),
+      savings_ratio:         parseFloat(document.getElementById('cpSavingsRatio').value),
+      collateral_ratio:      parseFloat(document.getElementById('cpCollateralRatio').value),
+    });
+    bootstrap.Modal.getInstance('#createProductModal').hide();
+    toast('Loan product created!');
+    await loadProducts();
+  } catch (err) {
+    document.getElementById('cpErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+// ── Admin Customers ───────────────────────────────────────────────────────────
+async function loadAdminCustomers(all = false) {
+  if (all === true) { document.getElementById('adCustSearch').value = ''; document.getElementById('adCustKYC').value = ''; }
+  let url = '/customers?page_size=50';
+  const q   = document.getElementById('adCustSearch')?.value?.trim();
+  const kyc = document.getElementById('adCustKYC')?.value;
+  if (q)   url += `&q=${encodeURIComponent(q)}`;
+  if (kyc) url += `&kyc_status=${kyc}`;
+  try {
+    const data  = await api('GET', url);
+    const items = data?.items || [];
+    document.getElementById('adCustTable').innerHTML = buildTable(
+      ['Account #','Name','Phone','KYC','Risk','Status','Created','Actions'],
+      items.map(c => [
+        `<code class="small">${c.account_number}</code>`,
+        `${c.first_name} ${c.last_name}`,
+        c.phone_e164,
+        badge(c.kyc_status),
+        c.risk_level || '—',
+        c.is_suspended
+          ? '<span class="badge bg-danger">Suspended</span>'
+          : (c.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'),
+        fmtD(c.created_at),
+        c.kyc_status === 'PENDING_REVIEW'
+          ? `<button class="btn btn-xs btn-success me-1" onclick="approveKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-check-lg"></i> Approve</button>
+             <button class="btn btn-xs btn-danger" onclick="rejectKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-x-lg"></i> Reject</button>`
+          : '—'
+      ])
+    );
+    if (!items.length) document.getElementById('adCustTable').innerHTML =
+      '<div class="text-center py-4" style="color:var(--grey);">No customers found</div>';
+  } catch (err) { toast(err.message, 'danger'); }
+}
+
+async function _loadKYCBadge() {
+  try {
+    const data = await api('GET', '/customers/kyc/pending?page_size=1');
+    const count = data?.total || 0;
+    const el = document.getElementById('kycBadge');
+    if (el) { el.textContent = count; el.style.display = count ? '' : 'none'; }
+  } catch (_) {}
+}
+
+async function loadPendingKYC() {
+  const panel = document.getElementById('kycPendingPanel');
+  panel.classList.remove('d-none');
+  document.getElementById('kycPendingTable').innerHTML =
+    '<div class="text-center py-4" style="color:var(--grey);">Loading…</div>';
+  try {
+    const data  = await api('GET', '/customers/kyc/pending?page_size=50');
+    const items = data?.items || [];
+
+    // Update badge
+    const badge_el = document.getElementById('kycBadge');
+    if (items.length) { badge_el.textContent = items.length; badge_el.style.display = ''; }
+    else badge_el.style.display = 'none';
+
+    document.getElementById('kycPendingTable').innerHTML = items.length
+      ? buildTable(
+          ['Account #','Name','Phone','Region','Occupation','Income (GHS)','Submitted','Actions'],
+          items.map(c => [
+            `<code class="small">${c.account_number}</code>`,
+            `<strong>${c.first_name} ${c.last_name}</strong>`,
+            c.phone_e164,
+            c.region || '—',
+            c.occupation || '—',
+            c.monthly_income_ghs ? fmt(c.monthly_income_ghs) : '—',
+            fmtD(c.updated_at || c.created_at),
+            `<button class="btn btn-xs btn-success me-1" onclick="approveKYC('${c.id}','${c.first_name} ${c.last_name}')">
+               <i class="bi bi-check-lg"></i> Approve
+             </button>
+             <button class="btn btn-xs btn-danger" onclick="rejectKYC('${c.id}','${c.first_name} ${c.last_name}')">
+               <i class="bi bi-x-lg"></i> Reject
+             </button>`
+          ])
+        )
+      : '<div class="text-center py-4" style="color:var(--grey);"><i class="bi bi-check-circle me-2" style="color:#4ade80;"></i>No pending KYC submissions</div>';
+  } catch (err) {
+    document.getElementById('kycPendingTable').innerHTML =
+      `<div class="alert alert-danger m-3">${err.message}</div>`;
+  }
+}
+
+async function approveKYC(customerId, name) {
+  if (!confirm2(`Approve KYC for ${name}? This will activate their account.`)) return;
+  try {
+    await api('POST', `/customers/${customerId}/kyc/approve`);
+    toast(`${name} — account approved and activated.`, 'success');
+    await loadPendingKYC();
+    await loadAdminCustomers(true);
+  } catch (err) { toast('Approve failed: ' + err.message, 'danger'); }
+}
+
+async function rejectKYC(customerId, name) {
+  const reason = prompt(`Rejection reason for ${name} (will be logged):`);
+  if (reason === null) return;
+  try {
+    await api('POST', `/customers/${customerId}/kyc/reject?reason=${encodeURIComponent(reason || 'KYC requirements not met')}`);
+    toast(`${name} — KYC rejected.`, 'warning');
+    await loadPendingKYC();
+    await loadAdminCustomers(true);
+  } catch (err) { toast('Reject failed: ' + err.message, 'danger'); }
+}
+
+// ── Admin Loans ───────────────────────────────────────────────────────────────
+async function loadAdminLoans() {
+  const status = document.getElementById('adLoanStatus')?.value;
+  let url = '/loans?page_size=50';
+  if (status) url += `&status=${status}`;
+  try {
+    const loans = await api('GET', url);
+    document.getElementById('adLoanTable').innerHTML = buildTable(
+      ['Loan #','Customer','Principal','Tenure','Status','Outstanding','Disbursed','Next Due'],
+      (loans||[]).map(l => [
+        `<code class="small">${l.loan_number}</code>`,
+        l.customer_id?.slice(0,8)+'…',
+        fmt(l.principal_ghs),
+        `${l.tenure_months}m`,
+        badge(l.status),
+        fmt(l.outstanding_ghs),
+        l.disbursed_at ? fmtD(l.disbursed_at) : '—',
+        l.next_due_date ? fmtD(l.next_due_date) : '—'
+      ])
+    );
+    if (!(loans||[]).length) document.getElementById('adLoanTable').innerHTML =
+      '<div class="text-center py-4" style="color:var(--grey);">No loans found</div>';
+  } catch (err) { toast(err.message, 'danger'); }
+}
+
+// ── Compliance ────────────────────────────────────────────────────────────────
+async function loadCompliance() {
+  try {
+    const dash = await api('GET', '/compliance/dashboard');
+    document.getElementById('aml-open').textContent   = dash?.open_alerts || 0;
+    document.getElementById('aml-review').textContent = dash?.under_review || 0;
+    document.getElementById('aml-filed').textContent  = (dash?.filed_ctr || 0) + (dash?.filed_str || 0);
+  } catch {}
+  await loadAMLAlerts();
+}
+
+async function loadAMLAlerts() {
+  const status = document.getElementById('amlFilter')?.value;
+  let url = '/compliance/aml/alerts?page_size=30';
+  if (status) url += `&status=${status}`;
+  try {
+    const alerts = await api('GET', url);
+    document.getElementById('amlTable').innerHTML = buildTable(
+      ['Type','Customer','Risk Score','Status','Date','Action'],
+      (alerts||[]).map(a => [
+        `<span class="badge bg-dark">${a.alert_type||'—'}</span>`,
+        a.customer_id?.slice(0,8)+'…',
+        `<span class="badge bg-${parseInt(a.risk_score||0) > 70 ? 'danger' : 'warning'}">${a.risk_score||'—'}</span>`,
+        badge(a.status),
+        fmtD(a.created_at),
+        `<button class="btn btn-xs btn-outline-secondary" onclick="updateAlert('${a.id}')"><i class="bi bi-pencil"></i> Update</button>`
+      ])
+    );
+    if (!(alerts||[]).length) document.getElementById('amlTable').innerHTML =
+      '<div class="text-center py-4" style="color:var(--grey);">No alerts found</div>';
+  } catch (err) { toast('AML load error: ' + err.message, 'danger'); }
+}
+
+async function updateAlert(id) {
+  const newStatus = prompt('New status (OPEN, UNDER_REVIEW, FILED_CTR, FILED_STR, DISMISSED):');
+  if (!newStatus) return;
+  const notes = prompt('Notes (optional):') || '';
+  try {
+    await api('PATCH', `/compliance/aml/alerts/${id}`, { status: newStatus, notes });
+    toast('Alert updated!');
+    await loadAMLAlerts();
+  } catch (err) { toast(err.message, 'danger'); }
+}
+
+async function verifyAuditChain() {
+  document.getElementById('chainResult').innerHTML = '<div class="spinner-border spinner-border-sm" style="color:var(--gold);"></div>';
+  try {
+    const r = await api('GET', '/compliance/audit/verify');
+    document.getElementById('chainResult').innerHTML = r.ok
+      ? `<div class="alert alert-success py-2"><i class="bi bi-shield-check me-2"></i>Chain intact. ${r.total} records verified.</div>`
+      : `<div class="alert alert-danger py-2"><i class="bi bi-shield-x me-2"></i>TAMPERED! ${r.tampered_count} records broken. First: ${r.first_tampered_id}</div>`;
+  } catch (err) {
+    document.getElementById('chainResult').innerHTML = `<div class="alert alert-danger py-2">${err.message}</div>`;
+  }
+}
+
+async function loadAuditLogs() {
+  try {
+    const logs = await api('GET', '/compliance/audit/logs?page_size=10');
+    document.getElementById('auditLogList').innerHTML = (logs||[]).map(l =>
+      `<div style="border-bottom:1px solid var(--border);padding:6px 0;">
+        <span class="badge bg-secondary">${l.action}</span>
+        <span style="font-size:0.78rem;margin-left:6px;">${l.table_name}</span>
+        <span style="font-size:0.72rem;color:var(--grey);margin-left:6px;">${fmtDT(l.timestamp)}</span>
+      </div>`).join('') || '<div style="color:var(--grey);font-size:0.78rem;">No logs</div>';
+  } catch (err) { toast(err.message, 'danger'); }
+}
+
+// ── Commissions ────────────────────────────────────────────────────────────────
+let _officers = [];
+
+async function loadCommissions() {
+  try {
+    const [policies, summaries] = await Promise.all([
+      api('GET', '/commissions/policy'),
+      api('GET', '/commissions/summary/all'),
+    ]);
+
+    // Policy card
+    const active = (policies||[]).find(p => p.is_active && !p.applies_to_product_id);
+    document.getElementById('commPolicyBody').innerHTML = active
+      ? `<div class="row g-3">
+           <div class="col-md-3 text-center">
+             <div style="font-size:2rem;color:var(--gold);font-weight:700;">${(parseFloat(active.commission_rate)*100).toFixed(1)}%</div>
+             <div style="color:var(--grey);font-size:0.8rem;">Commission Rate</div>
+           </div>
+           <div class="col-md-3 text-center">
+             <div style="font-size:2rem;color:var(--gold);font-weight:700;">${active.trigger_repayment}</div>
+             <div style="color:var(--grey);font-size:0.8rem;">From Repayment #</div>
+           </div>
+           <div class="col-md-6 d-flex align-items-center">
+             <div>
+               <strong>${active.name}</strong><br>
+               <span style="color:var(--grey);font-size:0.8rem;">Officers earn ${(parseFloat(active.commission_rate)*100).toFixed(1)}% of interest collected on every repayment from #${active.trigger_repayment} onwards</span>
+             </div>
+           </div>
+         </div>`
+      : '<div class="text-center py-3" style="color:var(--grey);">No active policy. Click "Set Policy" to create one.</div>';
+
+    // Summaries table
+    if (!(summaries||[]).length) {
+      document.getElementById('commSummaryTable').innerHTML =
+        '<div class="text-center py-4" style="color:var(--grey);">No commission records yet.</div>';
+    } else {
+      document.getElementById('commSummaryTable').innerHTML = buildTable(
+        ['Officer','Total Earned','Pending','Paid','Records','Action'],
+        summaries.map(s => [
+          s.officer_name || s.officer_id.slice(0,8)+'…',
+          'GHS ' + parseFloat(s.total_earned).toFixed(2),
+          '<span class="badge bg-warning text-dark">GHS ' + parseFloat(s.total_pending).toFixed(2) + '</span>',
+          '<span class="badge bg-success">GHS ' + parseFloat(s.total_paid).toFixed(2) + '</span>',
+          s.commission_count,
+          `<button class="btn btn-xs btn-gsl" onclick="viewOfficerCommissions('${s.officer_id}','${s.officer_name||''}')">View</button>`,
+        ])
+      );
+    }
+
+    // Pre-load officers and products for modals
+    _officers = await api('GET', '/admin/users?role=FIELD_OFFICER').catch(() => []);
+    const products = await api('GET', '/loans/products?active_only=false').catch(() => []);
+    document.getElementById('cpolicyProduct').innerHTML =
+      '<option value="">All products (global default)</option>' +
+      (products||[]).map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+  } catch (err) { toast('Error loading commissions: ' + err.message, 'danger'); }
+}
+
+async function saveCommPolicy(e) {
+  e.preventDefault();
+  document.getElementById('commPolicyErr').innerHTML = '';
+  try {
+    const body = {
+      name: document.getElementById('cpolicyName').value,
+      commission_rate: parseFloat(document.getElementById('cpolicyRate').value),
+      trigger_repayment: parseInt(document.getElementById('cpolicyTrigger').value),
+      is_active: true,
+      applies_to_product_id: document.getElementById('cpolicyProduct').value || null,
+    };
+    await api('POST', '/commissions/policy', body);
+    bootstrap.Modal.getInstance('#commPolicyModal').hide();
+    toast('Commission policy saved!');
+    await loadCommissions();
+  } catch (err) {
+    document.getElementById('commPolicyErr').innerHTML =
+      `<div class="alert alert-danger py-2 mb-3">${err.message}</div>`;
+  }
+}
+
+async function viewOfficerCommissions(officerId, name) {
+  try {
+    const comms = await api('GET', `/commissions/officer/${officerId}`);
+    const pending = comms.filter(c => c.status === 'PENDING');
+    const pendingIds = pending.map(c => c.id);
+    const modal = `
+      <div class="modal fade" id="officerCommModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Commissions — ${name}</h5>
+              <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+              ${buildTable(
+                ['Repayment #','Interest','Rate','Commission','Status','Date'],
+                comms.map(c => [
+                  '#' + c.repayment_number,
+                  'GHS ' + parseFloat(c.interest_amount).toFixed(2),
+                  (parseFloat(c.commission_rate)*100).toFixed(1)+'%',
+                  'GHS ' + parseFloat(c.commission_amount).toFixed(2),
+                  c.status === 'PAID'
+                    ? '<span class="badge bg-success">PAID</span>'
+                    : '<span class="badge bg-warning text-dark">PENDING</span>',
+                  new Date(c.created_at).toLocaleDateString(),
+                ])
+              )}
+            </div>
+            <div class="modal-footer">
+              ${pending.length ? `<button class="btn btn-gsl" onclick="payoutCommissions(${JSON.stringify(pendingIds)}, '${officerId}')">
+                <i class="bi bi-cash me-1"></i>Pay All Pending (${pending.length})
+              </button>` : ''}
+              <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    document.getElementById('sec-commissions').insertAdjacentHTML('beforeend', modal);
+    new bootstrap.Modal('#officerCommModal').show();
+    document.getElementById('officerCommModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
+  } catch (err) { toast('Error: ' + err.message, 'danger'); }
+}
+
+async function payoutCommissions(ids, officerId) {
+  const ref = window.prompt('Enter payment reference (e.g. bank transfer or cheque number):');
+  if (!ref) return;
+  try {
+    const r = await api('POST', '/commissions/payout', { commission_ids: ids, payment_reference: ref });
+    toast(r.detail, 'success');
+    bootstrap.Modal.getInstance('#officerCommModal')?.hide();
+    await loadCommissions();
+  } catch (err) { toast('Error: ' + err.message, 'danger'); }
+}
+
+async function searchCustomersForAssign() {
+  const q = document.getElementById('assignCustSearch').value.trim();
+  if (q.length < 2) return;
+  try {
+    const data = await api('GET', `/customers?q=${encodeURIComponent(q)}&page_size=20`);
+    const customers = data.items || [];
+    if (!customers.length) {
+      document.getElementById('assignTable').innerHTML =
+        '<div class="text-center py-4" style="color:var(--grey);">No customers found.</div>';
+      return;
+    }
+    // Build officer dropdown options
+    const officerOpts = (_officers||[]).map(o =>
+      `<option value="${o.id}">${o.full_name || o.email}</option>`
+    ).join('');
+
+    document.getElementById('assignTable').innerHTML = buildTable(
+      ['Account','Name','KYC','Current Officer','Assign Officer','Action'],
+      customers.map(c => [
+        c.account_number,
+        c.first_name + ' ' + c.last_name,
+        `<span class="badge ${c.kyc_status==='ACTIVE'?'bg-success':'bg-secondary'}">${c.kyc_status}</span>`,
+        c.assigned_officer_id ? ((_officers||[]).find(o=>o.id===c.assigned_officer_id)?.full_name || c.assigned_officer_id.slice(0,8)+'…') : '<span style="color:var(--grey);">Unassigned</span>',
+        `<select class="form-select form-select-sm" id="offSel_${c.id}" style="min-width:150px;">
+           <option value="">Select officer…</option>
+           ${officerOpts}
+         </select>`,
+        `<button class="btn btn-xs btn-gsl" onclick="assignOfficer('${c.id}')">Assign</button>`,
+      ])
+    );
+  } catch (err) { toast('Error: ' + err.message, 'danger'); }
+}
+
+async function assignOfficer(customerId) {
+  const sel = document.getElementById('offSel_' + customerId);
+  if (!sel?.value) { toast('Please select an officer first', 'warning'); return; }
+  try {
+    await api('POST', `/commissions/assign/${customerId}`, { officer_id: sel.value });
+    toast('Officer assigned!', 'success');
+    searchCustomersForAssign();
+  } catch (err) { toast('Error: ' + err.message, 'danger'); }
+}
+
+// ── System ────────────────────────────────────────────────────────────────────
+async function loadSystem() {
+  try {
+    const [health, stats] = await Promise.all([api('GET', '/health'), api('GET', '/admin/system/stats')]);
+    document.getElementById('sysInfo').innerHTML = `
+      <dl class="row small mb-0">
+        <dt class="col-5">Institution</dt><dd class="col-7 fw-semibold">${health.institution||'—'}</dd>
+        <dt class="col-5">Version</dt><dd class="col-7"><code>${health.version||'—'}</code></dd>
+        <dt class="col-5">Environment</dt><dd class="col-7">${health.environment||'—'}</dd>
+        <dt class="col-5">BoG Licence</dt><dd class="col-7 font-monospace small">${health.bog_licence||'—'}</dd>
+        <dt class="col-5">Total Audit Logs</dt><dd class="col-7">${stats.compliance.total_audit_logs}</dd>
+        <dt class="col-5">Staff Users</dt><dd class="col-7">${stats.staff.total} (${stats.staff.active} active)</dd>
+      </dl>`;
+    document.getElementById('sysHealth').innerHTML = `
+      <div class="d-flex flex-column gap-2">
+        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background:var(--surface2);border:1px solid var(--border);">
+          <span style="font-size:0.82rem;">Database</span>
+          <span class="badge bg-${health.components?.database==='up'?'success':'danger'}">${health.components?.database||'unknown'}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background:var(--surface2);border:1px solid var(--border);">
+          <span style="font-size:0.82rem;">API Status</span>
+          <span class="badge bg-${health.status==='healthy'?'success':'danger'}">${health.status||'unknown'}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background:var(--surface2);border:1px solid var(--border);">
+          <span style="font-size:0.82rem;">DCD 2025 Simple Interest</span>
+          <span class="badge bg-${health.regulatory?.dcd_2025_clause_14==='COMPLIANT'?'success':'warning'}">${health.regulatory?.dcd_2025_clause_14||'Check'}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background:var(--surface2);border:1px solid var(--border);">
+          <span style="font-size:0.82rem;">Last Updated</span>
+          <span style="color:var(--grey);font-size:0.75rem;">${fmtDT(health.timestamp)}</span>
+        </div>
+      </div>`;
+  } catch (err) { toast('System load error: ' + err.message, 'danger'); }
+}
+</script>
+</body>
+</html>

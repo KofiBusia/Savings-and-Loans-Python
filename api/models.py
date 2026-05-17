@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import (
@@ -134,6 +135,9 @@ class Customer(Base):
     edd_required = Column(Boolean, default=False, nullable=False)
     edd_completed_at = Column(DateTime(timezone=True))
 
+    # Savings product preference (set during KYC, applied on approval)
+    savings_product_id = Column(String(36), nullable=True)
+
     # Account status
     is_active = Column(Boolean, default=False, nullable=False)
     is_suspended = Column(Boolean, default=False, nullable=False)
@@ -143,6 +147,7 @@ class Customer(Base):
     created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=_now, onupdate=_now)
     onboarded_by = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=True)
+    assigned_officer_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=True)
 
     # Relationships
     savings_accounts = relationship("SavingsAccount", back_populates="customer", lazy="select")
@@ -209,6 +214,25 @@ class DeviceBinding(Base):
 # ──────────────────────────────────────────────────────────────────────────────
 # SAVINGS
 # ──────────────────────────────────────────────────────────────────────────────
+
+class SavingsProduct(Base):
+    """Savings product templates — reviewed and created by admin."""
+    __tablename__ = "savings_products"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=_uuid)
+    name = Column(String(100), nullable=False, unique=True)
+    description = Column(Text)
+
+    interest_rate_pa = Column(Numeric(5, 4), nullable=False, default=0)  # e.g. 0.0800 = 8% p.a.
+    minimum_balance = Column(Numeric(18, 2), nullable=False, default=0)
+    minimum_deposit = Column(Numeric(18, 2), nullable=False, default=0)
+    lock_period_days = Column(Integer, default=0, nullable=False)  # 0 = no lock
+
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_by = Column(UUID(as_uuid=False), ForeignKey("users.id"))
+    created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=_now, onupdate=_now)
+
 
 class SavingsAccount(Base):
     __tablename__ = "savings_accounts"
@@ -301,6 +325,8 @@ class LoanProduct(Base):
     minimum_kyc_status = Column(String(40), nullable=False, default="ACTIVE")
 
     is_active = Column(Boolean, default=True, nullable=False)
+    savings_ratio = Column(Numeric(5, 4), nullable=False, default=Decimal("0.70"))  # e.g. 0.70 = 70% of savings
+    collateral_ratio = Column(Numeric(5, 4), nullable=False, default=Decimal("0.50"))  # e.g. 0.50 = 50% of collateral
     created_by = Column(UUID(as_uuid=False), ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=_now, onupdate=_now)
@@ -419,6 +445,49 @@ class LoanRepayment(Base):
     created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
 
     loan = relationship("Loan", back_populates="repayments")
+
+
+class CommissionPolicy(Base):
+    """Global commission policy — managed by SUPER_ADMIN."""
+    __tablename__ = "commission_policies"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=_uuid)
+    name = Column(String(100), nullable=False, default="Default Policy")
+    commission_rate = Column(Numeric(5, 4), nullable=False)  # e.g. 0.0500 = 5% of interest
+    trigger_repayment = Column(Integer, nullable=False, default=6)  # commissions start from this repayment
+    is_active = Column(Boolean, default=True, nullable=False)
+    applies_to_product_id = Column(UUID(as_uuid=False), ForeignKey("loan_products.id"), nullable=True)
+    # NULL = global default; set to a product ID to override for that product
+
+    created_by = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    updated_by = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
+class LoanOfficerCommission(Base):
+    """Commission earned by a loan officer on a specific repayment."""
+    __tablename__ = "loan_officer_commissions"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=_uuid)
+    officer_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False, index=True)
+    loan_id = Column(UUID(as_uuid=False), ForeignKey("loans.id"), nullable=False, index=True)
+    repayment_id = Column(UUID(as_uuid=False), ForeignKey("loan_repayments.id"), nullable=False, unique=True)
+    policy_id = Column(UUID(as_uuid=False), ForeignKey("commission_policies.id"), nullable=True)
+
+    repayment_number = Column(Integer, nullable=False)  # which repayment triggered this
+    interest_amount = Column(Numeric(18, 2), nullable=False)  # interest component of the repayment
+    commission_rate = Column(Numeric(5, 4), nullable=False)  # rate snapshot at time of creation
+    commission_amount = Column(Numeric(18, 2), nullable=False)  # = interest_amount * commission_rate
+
+    status = Column(String(20), nullable=False, default="PENDING")  # PENDING | PAID | CANCELLED
+    paid_at = Column(DateTime(timezone=True))
+    paid_by = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=True)
+    payment_reference = Column(String(100))
+    notes = Column(Text)
+
+    created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=_now, onupdate=_now)
 
 
 class CollateralRegistry(Base):

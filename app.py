@@ -27,12 +27,14 @@ import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from api.config import settings
 from api.database import init_db
 from api.middleware.data_residency import DataResidencyMiddleware
-from api.routers import admin, auth, compliance, customers, health, loans, savings
+from api.routers import admin, auth, compliance, commissions, customers, health, loans, savings
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 
@@ -137,6 +139,11 @@ def create_app() -> FastAPI:
             content={"detail": "Internal server error", "request_id": rid},
         )
 
+    # ── Static files ──────────────────────────────────────────────────────
+    import os
+    if os.path.isdir("static"):
+        app.mount("/static", StaticFiles(directory="static"), name="static")
+
     # ── Routers ───────────────────────────────────────────────────────────
     PREFIX = "/api/v1"
     for router in [
@@ -147,6 +154,7 @@ def create_app() -> FastAPI:
         savings.router,
         compliance.router,
         admin.router,
+        commissions.router,
     ]:
         app.include_router(router, prefix=PREFIX)
 
@@ -154,6 +162,30 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+# ─── Web Templates ────────────────────────────────────────────────────────────
+
+_templates = Jinja2Templates(directory="templates")
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def login_page(request: Request):
+    return _templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/customer", response_class=HTMLResponse, include_in_schema=False)
+def customer_portal(request: Request):
+    return _templates.TemplateResponse("customer.html", {"request": request})
+
+
+@app.get("/staff", response_class=HTMLResponse, include_in_schema=False)
+def staff_portal(request: Request):
+    return _templates.TemplateResponse("staff.html", {"request": request})
+
+
+@app.get("/admin", response_class=HTMLResponse, include_in_schema=False)
+def admin_portal(request: Request):
+    return _templates.TemplateResponse("admin.html", {"request": request})
 
 
 # ─── Main Entry Point ─────────────────────────────────────────────────────────

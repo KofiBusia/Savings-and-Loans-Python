@@ -14,7 +14,10 @@ from sqlalchemy.orm import Session
 from api import models
 from api.compliance.kyc_state_machine import KYCStateMachine
 from api.database import get_db
-from api.deps import get_current_customer, get_current_user, require_roles
+from api.deps import get_current_customer, get_current_customer_any, get_current_user, require_roles
+from pydantic import BaseModel
+from typing import Optional
+
 from api.schemas.customers import (
     BeneficialOwnerRequest,
     CustomerCreateRequest,
@@ -24,6 +27,17 @@ from api.schemas.customers import (
     KYCStatusResponse,
     KYCStepRequest,
 )
+
+
+class KYCSubmitRequest(BaseModel):
+    date_of_birth: Optional[str] = None
+    gender: Optional[str] = None
+    residential_address: Optional[str] = None
+    region: Optional[str] = None
+    district: Optional[str] = None
+    occupation: Optional[str] = None
+    monthly_income_ghs: Optional[float] = None
+    savings_product_id: Optional[str] = None
 from api.security import generate_account_number, hash_password
 from api.utils.audit_chain import write_audit
 from api.validators.ghana_validators import validate_ghana_phone
@@ -120,6 +134,77 @@ def list_customers(
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
 
+    return CustomerListResponse(total=total, page=page, page_size=page_size, items=items)
+
+
+# ── Customer self-service — MUST be before /{customer_id} ────────────────────
+
+@router.get("/me/profile", response_model=CustomerResponse, summary="Customer profile (mobile)")
+def customer_profile(
+    current_customer: models.Customer = Depends(get_current_customer_any),
+):
+    """Works for all customers including those pending KYC."""
+    return current_customer
+
+
+@router.post("/me/kyc/submit", response_model=CustomerResponse,
+             summary="Customer submits KYC details for admin review")
+def submit_kyc(
+    body: KYCSubmitRequest,
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(get_current_customer_any),
+):
+    if current_customer.kyc_status not in ("PENDING_GHANA_CARD", "REJECTED"):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot submit KYC when status is '{current_customer.kyc_status}'. "
+                   "Contact support if you believe this is an error.",
+        )
+    if body.date_of_birth:
+        try:
+            from datetime import datetime as _dt
+            current_customer.date_of_birth = _dt.fromisoformat(body.date_of_birth)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date_of_birth format. Use YYYY-MM-DD.")
+    if body.gender:
+        current_customer.gender = body.gender
+    if body.residential_address:
+        current_customer.residential_address = body.residential_address
+    if body.region:
+        current_customer.region = body.region
+    if body.district:
+        current_customer.district = body.district
+    if body.occupation:
+        current_customer.occupation = body.occupation
+    if body.monthly_income_ghs is not None:
+        current_customer.monthly_income_ghs = body.monthly_income_ghs
+    if body.savings_product_id:
+        current_customer.savings_product_id = body.savings_product_id
+
+    current_customer.kyc_status = "PENDING_REVIEW"
+    db.commit()
+
+    write_audit(db, table_name="customers", record_id=current_customer.id,
+                action="KYC_SUBMITTED", actor_id=current_customer.id, actor_type="CUSTOMER",
+                data={"kyc_status": "PENDING_REVIEW"})
+    db.commit()
+
+    return current_customer
+
+
+@router.get("/kyc/pending", response_model=CustomerListResponse,
+            summary="List customers pending KYC review (admin)")
+def list_pending_kyc(
+    page: int = 1,
+    page_size: int = 50,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_roles(
+        "FIELD_OFFICER", "COMPLIANCE_OFFICER", "ADMIN", "SUPER_ADMIN"
+    )),
+):
+    query = db.query(models.Customer).filter_by(kyc_status="PENDING_REVIEW")
+    total = query.count()
+    items = query.order_by(models.Customer.created_at.asc()).offset((page - 1) * page_size).limit(page_size).all()
     return CustomerListResponse(total=total, page=page, page_size=page_size, items=items)
 
 
@@ -292,13 +377,73 @@ def add_beneficial_owner(
     return {"id": owner.id, "detail": "Beneficial owner added"}
 
 
-# ─── Customer self-service (mobile app) ───────────────────────────────────────
+# ─── KYC Admin Actions ────────────────────────────────────────────────────────
 
-@router.get("/me/profile", response_model=CustomerResponse, summary="Customer profile (mobile)")
-def customer_profile(
-    current_customer: models.Customer = Depends(get_current_customer),
+@router.post("/{customer_id}/kyc/approve", response_model=CustomerResponse,
+             summary="Approve customer KYC — activates account")
+def approve_kyc(
+    customer_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_roles(
+        "COMPLIANCE_OFFICER", "ADMIN", "SUPER_ADMIN"
+    )),
 ):
-    return current_customer
+    customer = _get_or_404(db, customer_id)
+    if customer.kyc_status != "PENDING_REVIEW":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Customer KYC status is '{customer.kyc_status}', not PENDING_REVIEW.",
+        )
+    customer.kyc_status = "ACTIVE"
+    customer.is_active = True
+    customer.kyc_completed_at = datetime.utcnow()
+
+    savings = db.query(models.SavingsAccount).filter_by(customer_id=customer_id).first()
+    if savings:
+        savings.status = "ACTIVE"
+        if customer.savings_product_id:
+            product = db.query(models.SavingsProduct).filter_by(id=customer.savings_product_id).first()
+            if product:
+                savings.product_name = product.name
+                savings.interest_rate_pa = product.interest_rate_pa
+                savings.minimum_balance = product.minimum_balance
+
+    db.commit()
+
+    write_audit(db, table_name="customers", record_id=customer.id,
+                action="KYC_APPROVED", actor_id=current_user.id,
+                data={"approved_by": current_user.email, "kyc_status": "ACTIVE"})
+    db.commit()
+
+    return customer
+
+
+@router.post("/{customer_id}/kyc/reject", response_model=CustomerResponse,
+             summary="Reject customer KYC")
+def reject_kyc(
+    customer_id: str,
+    reason: str = "KYC requirements not met",
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_roles(
+        "COMPLIANCE_OFFICER", "ADMIN", "SUPER_ADMIN"
+    )),
+):
+    customer = _get_or_404(db, customer_id)
+    if customer.kyc_status != "PENDING_REVIEW":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Customer KYC status is '{customer.kyc_status}', not PENDING_REVIEW.",
+        )
+    customer.kyc_status = "REJECTED"
+    customer.is_active = False
+    db.commit()
+
+    write_audit(db, table_name="customers", record_id=customer.id,
+                action="KYC_REJECTED", actor_id=current_user.id,
+                data={"reason": reason, "kyc_status": "REJECTED"})
+    db.commit()
+
+    return customer
 
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────

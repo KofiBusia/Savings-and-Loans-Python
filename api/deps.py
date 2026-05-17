@@ -81,6 +81,27 @@ def require_roles(*roles: str) -> Callable:
 
 # ─── Customer Auth ────────────────────────────────────────────────────────────
 
+def get_current_customer_any(
+    credentials: HTTPAuthorizationCredentials = Depends(_bearer),
+    db: Session = Depends(get_db),
+) -> models.Customer:
+    """Validate customer token but allow inactive/pending-KYC customers through."""
+    token = credentials.credentials
+    try:
+        payload = decode_token(token)
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+    if payload.get("type") != "customer_access":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Wrong token type")
+    customer_id: str | None = payload.get("sub")
+    if not customer_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has no subject")
+    customer = db.query(models.Customer).filter_by(id=customer_id).first()
+    if not customer:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Customer not found")
+    return customer
+
+
 def get_current_customer(
     credentials: HTTPAuthorizationCredentials = Depends(_bearer),
     db: Session = Depends(get_db),

@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Portal — Ghana Savings &amp; Loans</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <style>
+    body { background: var(--dark2); }
+  </style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="top-navbar">
+  <a class="brand-logo" href="/customer">
+    <div class="logo-box"><i class="bi bi-bank2"></i></div>
+    <div class="logo-text">
+      <strong>Ghana S&amp;L</strong>
+      <small>Customer Portal</small>
+    </div>
+  </a>
+
+  <ul class="nav d-none d-md-flex">
+    <li class="nav-item"><a class="nav-link" href="#dashboard" data-section="dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link" href="#savings"   data-section="savings"><i class="bi bi-piggy-bank me-1"></i>Savings</a></li>
+    <li class="nav-item"><a class="nav-link" href="#loans"     data-section="loans"><i class="bi bi-cash-coin me-1"></i>Loans</a></li>
+    <li class="nav-item"><a class="nav-link" href="#profile"   data-section="profile"><i class="bi bi-person me-1"></i>Profile</a></li>
+  </ul>
+
+  <div class="d-flex align-items-center gap-3">
+    <span id="navName" class="d-none d-md-inline" style="font-size:0.78rem;color:var(--grey);"></span>
+    <button class="btn btn-sm btn-outline-light" onclick="logout()">
+      <i class="bi bi-box-arrow-right me-1"></i><span class="d-none d-sm-inline">Logout</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile nav pills -->
+<div class="d-md-none" style="background:var(--dark);border-bottom:1px solid var(--border);padding:0.5rem 1rem;">
+  <ul class="nav nav-pills nav-fill" style="gap:4px;">
+    <li class="nav-item"><a class="nav-link py-1" href="#dashboard" data-section="dashboard" style="font-size:0.72rem;"><i class="bi bi-speedometer2 d-block mb-1" style="font-size:1rem;"></i>Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link py-1" href="#savings"   data-section="savings"   style="font-size:0.72rem;"><i class="bi bi-piggy-bank d-block mb-1" style="font-size:1rem;"></i>Savings</a></li>
+    <li class="nav-item"><a class="nav-link py-1" href="#loans"     data-section="loans"     style="font-size:0.72rem;"><i class="bi bi-cash-coin d-block mb-1" style="font-size:1rem;"></i>Loans</a></li>
+    <li class="nav-item"><a class="nav-link py-1" href="#profile"   data-section="profile"   style="font-size:0.72rem;"><i class="bi bi-person d-block mb-1" style="font-size:1rem;"></i>Profile</a></li>
+  </ul>
+</div>
+
+<!-- Main Content -->
+<div class="container-xl px-3 px-md-4 py-4">
+
+  <!-- ══════════════ DASHBOARD ══════════════ -->
+  <div id="sec-dashboard">
+    <div class="section-title"><i class="bi bi-speedometer2 me-2" style="color:var(--gold);"></i>My Dashboard</div>
+
+    <!-- Balance card -->
+    <div class="balance-card mb-4" id="balanceCard">
+      <div class="balance-label">Total Savings Balance</div>
+      <div class="balance-amount" id="balAmt">GHS 0.00</div>
+      <div class="account-num" id="balAcct">Account: —</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-gsl" onclick="openDeposit()">
+          <i class="bi bi-plus-circle me-1"></i>Deposit
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="openWithdraw()">
+          <i class="bi bi-dash-circle me-1"></i>Withdraw
+        </button>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="row g-3 mb-4" id="dashStats">
+      <div class="col-4 col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-cash-coin"></i></div>
+          <div>
+            <div class="stat-value" id="dActiveLoans">0</div>
+            <div class="stat-label">Active Loans</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4 col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="bi bi-calendar-check"></i></div>
+          <div>
+            <div class="stat-value" id="dNextDue" style="font-size:1.1rem;">—</div>
+            <div class="stat-label">Next Payment Due</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4 col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="bi bi-arrow-down-circle"></i></div>
+          <div>
+            <div class="stat-value" id="dOutstanding" style="font-size:1.1rem;">GHS 0</div>
+            <div class="stat-label">Outstanding Balance</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent transactions -->
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-clock-history me-2" style="color:var(--gold);"></i>Recent Transactions</span>
+        <a href="#savings" class="btn btn-sm btn-outline-secondary">View Statement</a>
+      </div>
+      <div class="card-body p-0" id="recentTxns">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SAVINGS ══════════════ -->
+  <div id="sec-savings" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0"><i class="bi bi-piggy-bank me-2" style="color:var(--gold);"></i>My Savings Account</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-gsl" onclick="openDeposit()"><i class="bi bi-plus-circle me-1"></i>Deposit</button>
+        <button class="btn btn-outline-secondary" onclick="openWithdraw()"><i class="bi bi-dash-circle me-1"></i>Withdraw</button>
+      </div>
+    </div>
+
+    <!-- Account info -->
+    <div class="card mb-4" id="savAcctCard">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Account Number</div>
+            <div class="fw-bold font-monospace mt-1" id="savAcctNum">—</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Balance</div>
+            <div class="fw-bold mt-1" style="color:#4ade80;font-size:1.1rem;" id="savBal">—</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Status</div>
+            <div class="mt-1" id="savStatus">—</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Interest Rate p.a.</div>
+            <div class="fw-bold mt-1" id="savRate">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statement filter -->
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <form class="row g-2 align-items-end" onsubmit="loadStatement(event)">
+          <div class="col-auto">
+            <label class="form-label mb-0">From</label>
+            <input type="date" id="stmtFrom" class="form-control form-control-sm">
+          </div>
+          <div class="col-auto">
+            <label class="form-label mb-0">To</label>
+            <input type="date" id="stmtTo" class="form-control form-control-sm">
+          </div>
+          <div class="col-auto"><button type="submit" class="btn btn-sm btn-gsl">Filter</button></div>
+          <div class="col-auto"><button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadStatement()">All</button></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Statement table -->
+    <div class="card">
+      <div class="card-header"><i class="bi bi-table me-2" style="color:var(--gold);"></i>Account Statement</div>
+      <div class="card-body p-0" id="stmtTable">
+        <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ LOANS ══════════════ -->
+  <div id="sec-loans" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div class="section-title mb-0"><i class="bi bi-cash-coin me-2" style="color:var(--gold);"></i>My Loans</div>
+      <button class="btn btn-gsl" onclick="openApplyLoan()">
+        <i class="bi bi-plus-circle me-1"></i>Apply for Loan
+      </button>
+    </div>
+
+    <div id="loansGrid" class="row g-3">
+      <div class="col-12 text-center py-5" style="color:var(--grey);">Loading your loans…</div>
+    </div>
+  </div>
+
+  <!-- ══════════════ PROFILE ══════════════ -->
+  <div id="sec-profile" class="d-none">
+    <div class="section-title"><i class="bi bi-person me-2" style="color:var(--gold);"></i>My Profile</div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header"><i class="bi bi-person-lines-fill me-2" style="color:var(--gold);"></i>Personal Information</div>
+          <div class="card-body" id="profilePersonal">
+            <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header"><i class="bi bi-shield-check me-2" style="color:var(--gold);"></i>Account Details</div>
+          <div class="card-body" id="profileAccount">
+            <div class="text-center py-4" style="color:var(--grey);">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ KYC ONBOARDING ══════════════ -->
+  <div id="sec-kyc" class="d-none">
+
+    <!-- Pending Review -->
+    <div id="kyc-waiting" class="d-none text-center py-5">
+      <div style="font-size:4rem;color:var(--gold);"><i class="bi bi-hourglass-split"></i></div>
+      <h4 class="mt-3 fw-semibold" style="color:var(--white);">Awaiting Admin Approval</h4>
+      <p style="color:var(--grey);max-width:420px;margin:0.75rem auto 0;">
+        Your KYC information has been submitted and is under review.<br>
+        You will be notified once your account is approved. This usually takes 1–2 business days.
+      </p>
+      <div class="mt-4 p-3 rounded" style="background:var(--surface);border:1px solid var(--border);display:inline-block;text-align:left;min-width:280px;">
+        <div class="small mb-1" style="color:var(--grey);">Status</div>
+        <span class="badge" style="background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3);">PENDING REVIEW</span>
+      </div>
+    </div>
+
+    <!-- Rejected -->
+    <div id="kyc-rejected" class="d-none text-center py-5">
+      <div style="font-size:4rem;color:#f87171;"><i class="bi bi-x-circle"></i></div>
+      <h4 class="mt-3 fw-semibold" style="color:var(--white);">KYC Not Approved</h4>
+      <p style="color:var(--grey);max-width:420px;margin:0.75rem auto 0;">
+        Your KYC submission was not approved. Please update your details and resubmit.
+      </p>
+      <button class="btn btn-gsl mt-3" onclick="showKYCForm()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Resubmit KYC
+      </button>
+    </div>
+
+    <!-- KYC Form -->
+    <div id="kyc-form">
+      <div class="section-title"><i class="bi bi-person-vcard me-2" style="color:var(--gold);"></i>Complete Your KYC Verification</div>
+      <div class="alert mb-4" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);color:var(--white);font-size:0.85rem;">
+        <i class="bi bi-info-circle me-2" style="color:var(--gold);"></i>
+        <strong>Required by law:</strong> BoG AML Act 1044 requires identity verification before your account can be activated. Your data is protected under Ghana Data Protection Act 843.
+      </div>
+      <form id="kycFormEl" onsubmit="submitKYC(event)">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header"><i class="bi bi-person me-2" style="color:var(--gold);"></i>Personal Details</div>
+              <div class="card-body">
+                <div id="kycErr"></div>
+                <div class="mb-3">
+                  <label class="form-label">Date of Birth <span style="color:#f87171;">*</span></label>
+                  <input type="date" id="kycDob" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Gender <span style="color:#f87171;">*</span></label>
+                  <select id="kycGender" class="form-select" required>
+                    <option value="">Select…</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Occupation</label>
+                  <input type="text" id="kycOccupation" class="form-control" placeholder="e.g. Trader, Teacher, Farmer">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Monthly Income (GHS)</label>
+                  <input type="number" id="kycIncome" class="form-control" step="0.01" min="0" placeholder="e.g. 2000">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header"><i class="bi bi-geo-alt me-2" style="color:var(--gold);"></i>Address &amp; Consent</div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label">Residential Address <span style="color:#f87171;">*</span></label>
+                  <textarea id="kycAddress" class="form-control" rows="2" placeholder="House number, street, town" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Region <span style="color:#f87171;">*</span></label>
+                  <select id="kycRegion" class="form-select" required>
+                    <option value="">Select region…</option>
+                    <option>Greater Accra</option><option>Ashanti</option><option>Western</option>
+                    <option>Eastern</option><option>Central</option><option>Volta</option>
+                    <option>Northern</option><option>Upper East</option><option>Upper West</option>
+                    <option>Brong-Ahafo</option><option>Oti</option><option>Bono East</option>
+                    <option>Ahafo</option><option>Western North</option><option>Savannah</option>
+                    <option>North East</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">District / Town</label>
+                  <input type="text" id="kycDistrict" class="form-control" placeholder="e.g. Accra Metropolitan">
+                </div>
+                <div class="mb-0">
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="kycConsent" required>
+                    <label class="form-check-label small" for="kycConsent" style="color:var(--grey);">
+                      I consent to data processing under Ghana Data Protection Act 843 and authorise
+                      credit bureau checks as required by Credit Reporting Regulations 2020 (L.I. 2394).
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row g-4 mt-0">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header"><i class="bi bi-piggy-bank me-2" style="color:var(--gold);"></i>Choose a Savings Product</div>
+              <div class="card-body">
+                <div class="mb-2">
+                  <label class="form-label">Savings Plan <span style="color:#f87171;">*</span></label>
+                  <select id="kycSavingsProduct" class="form-select" required>
+                    <option value="">Loading products…</option>
+                  </select>
+                </div>
+                <div id="kycProductDetails" class="small mt-2" style="color:var(--grey);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 d-flex justify-content-end">
+          <button type="submit" class="btn btn-gsl px-4">
+            <i class="bi bi-send me-2"></i>Submit for Review
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div><!-- /sec-kyc -->
+
+</div><!-- /container -->
+
+<!-- ── Deposit Modal ── -->
+<div class="modal fade" id="depositModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title"><i class="bi bi-plus-circle me-2" style="color:var(--gold);"></i>Make a Deposit</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="submitDeposit(event)">
+        <div class="modal-body">
+          <div id="depErr"></div>
+          <div class="mb-3">
+            <label class="form-label">Amount (GHS)</label>
+            <input type="number" id="depAmt" class="form-control" step="0.01" min="1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Channel</label>
+            <select id="depChannel" class="form-select">
+              <option value="MOBILE_MONEY">Mobile Money</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+              <option value="CASH">Cash</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Narration (optional)</label>
+            <input type="text" id="depNote" class="form-control" placeholder="e.g. Monthly savings">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-check-circle me-1"></i>Confirm Deposit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Withdraw Modal ── -->
+<div class="modal fade" id="withdrawModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title"><i class="bi bi-dash-circle me-2" style="color:#f87171;"></i>Withdraw Funds</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="submitWithdraw(event)">
+        <div class="modal-body">
+          <div id="wdErr"></div>
+          <div class="mb-3">
+            <label class="form-label">Amount (GHS)</label>
+            <input type="number" id="wdAmt" class="form-control" step="0.01" min="1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Channel</label>
+            <select id="wdChannel" class="form-select">
+              <option value="MOBILE_MONEY">Mobile Money</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Narration (optional)</label>
+            <input type="text" id="wdNote" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger"><i class="bi bi-check-circle me-1"></i>Confirm Withdrawal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Apply for Loan Modal ── -->
+<div class="modal fade" id="loanModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title"><i class="bi bi-cash-coin me-2" style="color:var(--gold);"></i>Apply for a Loan</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form onsubmit="submitLoanApp(event)">
+        <div class="modal-body">
+          <div id="loanErr"></div>
+          <div class="mb-3">
+            <label class="form-label">Loan Product</label>
+            <select id="loanProduct" class="form-select" onchange="updateLoanLimits()" required>
+              <option value="">Select product…</option>
+            </select>
+          </div>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Amount (GHS)</label>
+              <input type="number" id="loanAmt" class="form-control" step="100" required>
+              <div class="form-text" id="loanAmtHint"></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Tenure (months)</label>
+              <input type="number" id="loanTenure" class="form-control" required>
+              <div class="form-text" id="loanTenureHint"></div>
+            </div>
+          </div>
+          <div class="mb-3 mt-3">
+            <label class="form-label">Disbursement Account (MoMo number)</label>
+            <input type="tel" id="loanAcct" class="form-control" placeholder="024xxxxxxx">
+          </div>
+          <!-- Eligibility Banner -->
+          <div id="loanEligBanner" class="alert d-none mb-3" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);color:var(--white);font-size:0.85rem;">
+            <div class="d-flex justify-content-between">
+              <span><i class="bi bi-info-circle me-1" style="color:var(--gold);"></i><strong>Your Loan Limit: <span id="eligMax">—</span></strong></span>
+              <span id="eligNote" style="color:var(--grey);font-size:0.78rem;"></span>
+            </div>
+            <div class="mt-1 small" style="color:var(--grey);" id="eligDetail"></div>
+          </div>
+          <!-- Collateral -->
+          <div class="mb-3">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="hasCollateral" onchange="toggleCollateral()">
+              <label class="form-check-label" for="hasCollateral">I have collateral to offer</label>
+            </div>
+            <div id="collateralFields" class="d-none">
+              <label class="form-label">Estimated Collateral Value (GHS)</label>
+              <input type="number" id="collateralValue" class="form-control" step="1000" min="0"
+                     placeholder="e.g. 200000" oninput="refreshEligibility()">
+              <div class="form-text">Loan limit = <span id="collatRatioHint">50</span>% of this value</div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Purpose</label>
+            <input type="text" id="loanPurpose" class="form-control" placeholder="e.g. Business expansion">
+          </div>
+          <!-- Quote preview -->
+          <div id="loanQuote" class="alert alert-info d-none">
+            <strong>Loan Summary</strong>
+            <div class="mt-2 small" id="loanQuoteBody"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" onclick="previewLoan()">
+            <i class="bi bi-calculator me-1"></i>Preview
+          </button>
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gsl"><i class="bi bi-send me-1"></i>Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+'use strict';
+if (!requireAuth('customer')) throw new Error('not authenticated');
+
+let _savAcctId = null;
+let _products  = [];
+let _isActive  = false;
+let _kycStatus = null;
+
+// ── Init — check account status before routing ───────────────────────────────
+const SECTIONS = ['dashboard','savings','loans','profile','kyc'];
+
+(async () => {
+  try {
+    const profile = await api('GET', '/customers/me/profile');
+    _isActive  = profile.is_active;
+    _kycStatus = profile.kyc_status;
+    if (profile.first_name) {
+      document.getElementById('navName').textContent =
+        `${profile.first_name} ${profile.last_name}`;
+    }
+    if (!_isActive) {
+      // Force to KYC section before nav initialises
+      history.replaceState(null, '', '#kyc');
+    }
+  } catch (e) {
+    // token issue — requireAuth will handle redirect
+  }
+  initNav(SECTIONS, 'dashboard', loadSection);
+})();
+
+async function loadSection(sec) {
+  if (sec === 'kyc')     return loadKYC();
+  if (sec === 'profile') return loadProfile();   // always accessible
+  if (!_isActive) {
+    _showActivationRequired('sec-' + sec);
+    return;
+  }
+  if (sec === 'dashboard') await loadDashboard();
+  if (sec === 'savings')   await loadSavings();
+  if (sec === 'loans')     await loadLoans();
+}
+
+function _showActivationRequired(sectionId) {
+  const el = document.getElementById(sectionId);
+  if (el) el.innerHTML = `
+    <div class="text-center py-5">
+      <div style="font-size:3.5rem;color:var(--gold);"><i class="bi bi-shield-lock"></i></div>
+      <h5 class="mt-3 fw-semibold" style="color:var(--white);">Account Not Yet Active</h5>
+      <p style="color:var(--grey);max-width:360px;margin:0.5rem auto 0;">
+        Complete your KYC verification so an admin can activate your account.
+      </p>
+      <a href="#kyc" class="btn btn-gsl mt-3"><i class="bi bi-arrow-right me-1"></i>Complete KYC</a>
+    </div>`;
+}
+
+// ── KYC Section ─────────────────────────────────────────────────────────────
+async function _loadSavingsProducts() {
+  const sel = document.getElementById('kycSavingsProduct');
+  if (!sel) return;
+  try {
+    const products = await fetch(BASE + '/savings/products/available').then(r => r.json());
+    sel.innerHTML = '<option value="">Select a savings plan…</option>' +
+      (products || []).map(p =>
+        `<option value="${p.id}" data-rate="${p.interest_rate_pa}" data-min="${p.minimum_balance}" data-lock="${p.lock_period_days}" data-desc="${p.description||''}">`+
+        `${p.name} — ${(parseFloat(p.interest_rate_pa)*100).toFixed(1)}% p.a.</option>`
+      ).join('');
+    sel.onchange = function() {
+      const opt = sel.selectedOptions[0];
+      const det = document.getElementById('kycProductDetails');
+      if (opt && opt.value) {
+        const rate = (parseFloat(opt.dataset.rate)*100).toFixed(1);
+        const minBal = parseFloat(opt.dataset.min).toFixed(2);
+        const lock = parseInt(opt.dataset.lock);
+        det.innerHTML = `<i class="bi bi-info-circle me-1" style="color:var(--gold);"></i>`+
+          `${opt.dataset.desc ? opt.dataset.desc+'<br>' : ''}`+
+          `Interest: <strong>${rate}% p.a.</strong> &nbsp;|&nbsp; `+
+          `Min Balance: <strong>GHS ${minBal}</strong>`+
+          (lock > 0 ? ` &nbsp;|&nbsp; Lock Period: <strong>${lock} days</strong>` : '');
+      } else { det.innerHTML = ''; }
+    };
+    if (!products || !products.length) {
+      sel.innerHTML = '<option value="">No savings products available yet</option>';
+      sel.removeAttribute('required');
+    }
+  } catch(_) {
+    sel.innerHTML = '<option value="">Could not load products</option>';
+    sel.removeAttribute('required');
+  }
+}
+
+async function loadKYC() {
+  document.getElementById('kyc-waiting').classList.add('d-none');
+  document.getElementById('kyc-rejected').classList.add('d-none');
+  document.getElementById('kyc-form').classList.add('d-none');
+
+  // Re-fetch status in case it changed (e.g. after submission)
+  try {
+    const p = await api('GET', '/customers/me/profile');
+    _kycStatus = p.kyc_status;
+    _isActive  = p.is_active;
+  } catch (_) {}
+
+  if (_isActive || _kycStatus === 'ACTIVE') {
+    // Already active — go to dashboard
+    location.hash = '#dashboard';
+    return;
+  }
+  if (_kycStatus === 'PENDING_REVIEW') {
+    document.getElementById('kyc-waiting').classList.remove('d-none');
+  } else if (_kycStatus === 'REJECTED') {
+    document.getElementById('kyc-rejected').classList.remove('d-none');
+  } else {
+    document.getElementById('kyc-form').classList.remove('d-none');
+    _loadSavingsProducts();
+  }
+}
+
+function showKYCForm() {
+  document.getElementById('kyc-waiting').classList.add('d-none');
+  document.getElementById('kyc-rejected').classList.add('d-none');
+  document.getElementById('kyc-form').classList.remove('d-none');
+}
+
+async function submitKYC(e) {
+  e.preventDefault();
+  document.getElementById('kycErr').innerHTML = '';
+  const btn = e.submitter;
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Submitting…'; }
+  try {
+    await api('POST', '/customers/me/kyc/submit', {
+      date_of_birth:       document.getElementById('kycDob').value || null,
+      gender:              document.getElementById('kycGender').value || null,
+      residential_address: document.getElementById('kycAddress').value || null,
+      region:              document.getElementById('kycRegion').value || null,
+      district:            document.getElementById('kycDistrict').value || null,
+      occupation:          document.getElementById('kycOccupation').value || null,
+      monthly_income_ghs:  parseFloat(document.getElementById('kycIncome').value) || null,
+      savings_product_id:  document.getElementById('kycSavingsProduct').value || null,
+    });
+    _kycStatus = 'PENDING_REVIEW';
+    toast('KYC submitted! Awaiting admin review.', 'success');
+    await loadKYC();
+  } catch (err) {
+    document.getElementById('kycErr').innerHTML =
+      `<div class="alert alert-danger py-2 mb-3">${err.message}</div>`;
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send me-2"></i>Submit for Review'; }
+  }
+}
+
+// ── Dashboard ───────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [accounts, loans] = await Promise.all([
+      api('GET', '/savings/my/accounts'),
+      api('GET', '/loans/my'),
+    ]);
+
+    const acct = accounts?.[0];
+    if (acct) {
+      _savAcctId = acct.id;
+      document.getElementById('balAmt').textContent = fmt(acct.balance);
+      document.getElementById('balAcct').textContent = 'Account: ' + acct.account_number;
+    }
+
+    const activeLoans = (loans || []).filter(l => ['ACTIVE','DISBURSED','OVERDUE'].includes(l.status));
+    document.getElementById('dActiveLoans').textContent = activeLoans.length;
+
+    const outstanding = activeLoans.reduce((s, l) => s + parseFloat(l.outstanding_ghs || 0), 0);
+    document.getElementById('dOutstanding').textContent = fmt(outstanding);
+
+    const nextDue = activeLoans.reduce((d, l) => {
+      if (!l.next_due_date) return d;
+      const nd = new Date(l.next_due_date);
+      return (!d || nd < d) ? nd : d;
+    }, null);
+    document.getElementById('dNextDue').textContent = nextDue ? fmtD(nextDue) : '—';
+
+    // Recent transactions
+    if (acct) {
+      const stmt = await api('GET', `/savings/my/statement?page_size=5`);
+      const txns = stmt?.transactions || [];
+      document.getElementById('recentTxns').innerHTML = txns.length
+        ? buildTable(['Date','Type','Amount','Balance'],
+            txns.map(t => [fmtDT(t.created_at), badge(t.type, t.type.replace(/_/g,' ')),
+              `<span class="${t.type.includes('DEPOSIT')||t.type==='INTEREST_CREDIT'?'text-success':'text-danger'} fw-semibold">${fmt(t.amount)}</span>`,
+              fmt(t.balance_after)]))
+        : '<div class="text-center py-4" style="color:var(--grey);">No transactions yet</div>';
+    }
+  } catch (err) {
+    toast('Error loading dashboard: ' + err.message, 'danger');
+  }
+}
+
+// ── Savings ─────────────────────────────────────────────────────────────────
+async function loadSavings() {
+  try {
+    const accounts = await api('GET', '/savings/my/accounts');
+    const acct = accounts?.[0];
+    if (!acct) {
+      document.getElementById('savAcctCard').innerHTML = '<div class="card-body" style="color:var(--grey);">No savings account found.</div>';
+      return;
+    }
+    _savAcctId = acct.id;
+    document.getElementById('savAcctNum').textContent = acct.account_number;
+    document.getElementById('savBal').textContent = fmt(acct.balance);
+    document.getElementById('savStatus').innerHTML = badge(acct.status);
+    document.getElementById('savRate').textContent = acct.interest_rate_pa
+      ? (parseFloat(acct.interest_rate_pa) * 100).toFixed(2) + '%' : 'N/A';
+    await loadStatement();
+  } catch (err) {
+    toast('Error loading savings: ' + err.message, 'danger');
+  }
+}
+
+async function loadStatement(e) {
+  if (e) e.preventDefault();
+  if (!_savAcctId) return;
+  let url = `/savings/my/statement?page_size=50`;
+  const from = document.getElementById('stmtFrom')?.value;
+  const to   = document.getElementById('stmtTo')?.value;
+  if (from) url += `&from_date=${from}T00:00:00`;
+  if (to)   url += `&to_date=${to}T23:59:59`;
+  try {
+    const stmt = await api('GET', url);
+    const txns = stmt?.transactions || [];
+    document.getElementById('stmtTable').innerHTML = buildTable(
+      ['Date & Time','Reference','Type','Channel','Amount','Balance After','Notes'],
+      txns.map(t => [
+        fmtDT(t.created_at), `<code class="small">${t.reference || '—'}</code>`,
+        badge(t.type, t.type.replace(/_/g,' ')), t.channel || '—',
+        `<span class="${t.type.includes('DEPOSIT')||t.type==='INTEREST_CREDIT'?'text-success fw-semibold':'text-danger fw-semibold'}">${fmt(t.amount)}</span>`,
+        fmt(t.balance_after), t.narration || '—'
+      ])
+    );
+  } catch (err) {
+    document.getElementById('stmtTable').innerHTML = `<div class="alert alert-danger m-3">${err.message}</div>`;
+  }
+}
+
+// ── Loans ────────────────────────────────────────────────────────────────────
+async function loadLoans() {
+  try {
+    const loans = await api('GET', '/loans/my');
+    const grid = document.getElementById('loansGrid');
+    if (!loans?.length) {
+      grid.innerHTML = `<div class="col-12 text-center py-5">
+        <i class="bi bi-cash-coin" style="font-size:3rem;color:var(--grey);"></i>
+        <p class="mt-2" style="color:var(--grey);">You have no loans yet.</p>
+        <button class="btn btn-gsl" onclick="openApplyLoan()"><i class="bi bi-plus me-1"></i>Apply for a Loan</button>
+      </div>`;
+      return;
+    }
+    grid.innerHTML = loans.map(l => `
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-semibold font-monospace small">${l.loan_number}</span>
+            ${badge(l.status)}
+          </div>
+          <div class="card-body">
+            <div class="row g-2">
+              <div class="col-6">
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Principal</div>
+                <strong>${fmt(l.principal_ghs)}</strong>
+              </div>
+              <div class="col-6">
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Monthly Payment</div>
+                <strong>${fmt(l.monthly_instalment_ghs)}</strong>
+              </div>
+              <div class="col-6">
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Outstanding</div>
+                <strong class="text-danger">${fmt(l.outstanding_ghs)}</strong>
+              </div>
+              <div class="col-6">
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Tenure</div>
+                <strong>${l.tenure_months} months</strong>
+              </div>
+              ${l.next_due_date ? `
+              <div class="col-12">
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Next Payment Due</div>
+                <strong class="${l.status==='OVERDUE'?'text-danger':''}">${fmtD(l.next_due_date)}</strong>
+              </div>` : ''}
+              ${l.disbursed_at ? `
+              <div class="col-12">
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--grey);">Disbursed</div>
+                <strong>${fmtD(l.disbursed_at)}</strong>
+              </div>` : ''}
+            </div>
+          </div>
+          <div class="card-footer">
+            Applied: ${fmtD(l.created_at)}
+            ${l.status === 'OVERDUE' ? '<span class="text-danger ms-2"><i class="bi bi-exclamation-triangle"></i> Payment overdue</span>' : ''}
+          </div>
+        </div>
+      </div>`).join('');
+  } catch (err) {
+    toast('Error loading loans: ' + err.message, 'danger');
+  }
+}
+
+// ── Profile ──────────────────────────────────────────────────────────────────
+async function loadProfile() {
+  try {
+    const p = await api('GET', '/customers/me/profile');
+    document.getElementById('profilePersonal').innerHTML = `
+      <dl class="row mb-0 small">
+        <dt class="col-5">Full Name</dt><dd class="col-7 fw-semibold">${p.first_name} ${p.last_name}</dd>
+        <dt class="col-5">Phone</dt><dd class="col-7 font-monospace">${p.phone_e164 || '—'}</dd>
+        <dt class="col-5">Email</dt><dd class="col-7">${p.email || '—'}</dd>
+        <dt class="col-5">Date of Birth</dt><dd class="col-7">${fmtD(p.date_of_birth)}</dd>
+        <dt class="col-5">Gender</dt><dd class="col-7">${p.gender || '—'}</dd>
+        <dt class="col-5">Occupation</dt><dd class="col-7">${p.occupation || '—'}</dd>
+        <dt class="col-5">Address</dt><dd class="col-7">${p.residential_address || '—'}</dd>
+        <dt class="col-5">Region</dt><dd class="col-7">${p.region || '—'}</dd>
+      </dl>`;
+    document.getElementById('profileAccount').innerHTML = `
+      <dl class="row mb-0 small">
+        <dt class="col-5">Account No.</dt><dd class="col-7 font-monospace fw-bold">${p.account_number}</dd>
+        <dt class="col-5">KYC Status</dt><dd class="col-7">${badge(p.kyc_status)}</dd>
+        <dt class="col-5">Risk Level</dt><dd class="col-7">${p.risk_level || '—'}</dd>
+        <dt class="col-5">Customer Type</dt><dd class="col-7">${p.customer_type || 'INDIVIDUAL'}</dd>
+        <dt class="col-5">Ghana Card</dt><dd class="col-7 font-monospace">${p.ghana_card_number || '—'}</dd>
+        <dt class="col-5">Member Since</dt><dd class="col-7">${fmtD(p.created_at)}</dd>
+        <dt class="col-5">Status</dt><dd class="col-7">${p.is_suspended ? '<span class="badge bg-danger">Suspended</span>' : '<span class="badge bg-success">Active</span>'}</dd>
+      </dl>`;
+  } catch (err) {
+    toast('Error loading profile: ' + err.message, 'danger');
+  }
+}
+
+// ── Deposit / Withdraw ───────────────────────────────────────────────────────
+function openDeposit() {
+  document.getElementById('depErr').innerHTML = '';
+  document.getElementById('depAmt').value = '';
+  new bootstrap.Modal('#depositModal').show();
+}
+async function submitDeposit(e) {
+  e.preventDefault();
+  document.getElementById('depErr').innerHTML = '';
+  try {
+    await api('POST', '/savings/my/deposit', {
+      amount_ghs: parseFloat(document.getElementById('depAmt').value),
+      channel: document.getElementById('depChannel').value,
+      narration: document.getElementById('depNote').value || null,
+    });
+    bootstrap.Modal.getInstance('#depositModal').hide();
+    toast('Deposit successful!');
+    await loadDashboard();
+    await loadSavings();
+  } catch (err) {
+    document.getElementById('depErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+function openWithdraw() {
+  document.getElementById('wdErr').innerHTML = '';
+  document.getElementById('wdAmt').value = '';
+  new bootstrap.Modal('#withdrawModal').show();
+}
+async function submitWithdraw(e) {
+  e.preventDefault();
+  document.getElementById('wdErr').innerHTML = '';
+  try {
+    await api('POST', '/savings/my/withdraw', {
+      amount_ghs: parseFloat(document.getElementById('wdAmt').value),
+      channel: document.getElementById('wdChannel').value,
+      narration: document.getElementById('wdNote').value || null,
+    });
+    bootstrap.Modal.getInstance('#withdrawModal').hide();
+    toast('Withdrawal successful!');
+    await loadDashboard();
+    await loadSavings();
+  } catch (err) {
+    document.getElementById('wdErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+
+// ── Loan Application ─────────────────────────────────────────────────────────
+async function openApplyLoan() {
+  document.getElementById('loanErr').innerHTML = '';
+  document.getElementById('loanQuote').classList.add('d-none');
+  document.getElementById('loanEligBanner').classList.add('d-none');
+  document.getElementById('hasCollateral').checked = false;
+  document.getElementById('collateralFields').classList.add('d-none');
+  if (!_products.length) {
+    try {
+      _products = await api('GET', '/loans/products/available');
+      const sel = document.getElementById('loanProduct');
+      sel.innerHTML = '<option value="">Select product…</option>' +
+        _products.map(p => `<option value="${p.id}" data-min="${p.min_amount_ghs}" data-max="${p.max_amount_ghs}"
+          data-tmin="${p.min_tenure_months}" data-tmax="${p.max_tenure_months}"
+          data-rate="${p.annual_interest_rate}"
+          data-savings-ratio="${p.savings_ratio||0.70}"
+          data-collateral-ratio="${p.collateral_ratio||0.50}"
+          >${p.name} (${(parseFloat(p.annual_interest_rate)*100).toFixed(1)}% p.a.)</option>`).join('');
+    } catch (err) {
+      toast('Could not load loan products: ' + err.message, 'warning');
+    }
+  }
+  new bootstrap.Modal('#loanModal').show();
+}
+
+function updateLoanLimits() {
+  const sel = document.getElementById('loanProduct');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+  document.getElementById('loanAmtHint').textContent = `GHS ${opt.dataset.min} – ${opt.dataset.max}`;
+  document.getElementById('loanTenureHint').textContent = `${opt.dataset.tmin} – ${opt.dataset.tmax} months`;
+  document.getElementById('loanAmt').min = opt.dataset.min;
+  document.getElementById('loanAmt').max = opt.dataset.max;
+  document.getElementById('loanTenure').min = opt.dataset.tmin;
+  document.getElementById('loanTenure').max = opt.dataset.tmax;
+  refreshEligibility();
+}
+
+async function previewLoan() {
+  const pid = document.getElementById('loanProduct').value;
+  const amt = document.getElementById('loanAmt').value;
+  const ten = document.getElementById('loanTenure').value;
+  if (!pid || !amt || !ten) { toast('Please fill in product, amount and tenure first', 'warning'); return; }
+  try {
+    const q = await api('GET', `/loans/quote?product_id=${pid}&principal_ghs=${amt}&tenure_months=${ten}`);
+    document.getElementById('loanQuote').classList.remove('d-none');
+    document.getElementById('loanQuoteBody').innerHTML = `
+      <div class="row g-1">
+        <div class="col-6">Principal: <strong>${fmt(q.principal_ghs)}</strong></div>
+        <div class="col-6">Interest: <strong>${fmt(q.total_interest_ghs)}</strong></div>
+        <div class="col-6">Processing Fee: <strong>${fmt(q.processing_fee_ghs)}</strong></div>
+        <div class="col-6">Insurance Fee: <strong>${fmt(q.insurance_fee_ghs)}</strong></div>
+        <div class="col-6">Monthly Payment: <strong>${fmt(q.monthly_instalment_ghs)}</strong></div>
+        <div class="col-6">Total Repayable: <strong>${fmt(q.total_repayable_ghs)}</strong></div>
+      </div>`;
+  } catch (err) {
+    toast('Preview error: ' + err.message, 'warning');
+  }
+}
+
+async function refreshEligibility() {
+  const sel = document.getElementById('loanProduct');
+  const pid = sel.value;
+  if (!pid) return;
+  const collat = document.getElementById('hasCollateral').checked
+    ? (parseFloat(document.getElementById('collateralValue').value) || 0) : 0;
+
+  const opt = sel.selectedOptions[0];
+  const savRatio = opt?.dataset.savingsRatio ? parseFloat(opt.dataset.savingsRatio) : 0.70;
+  const colRatio = opt?.dataset.collateralRatio ? parseFloat(opt.dataset.collateralRatio) : 0.50;
+  document.getElementById('collatRatioHint').textContent = Math.round(colRatio * 100);
+
+  try {
+    const params = new URLSearchParams({ product_id: pid });
+    if (collat > 0) params.set('collateral_value_ghs', collat);
+    const elig = await api('GET', '/loans/my/eligibility?' + params.toString());
+    const banner = document.getElementById('loanEligBanner');
+    banner.classList.remove('d-none');
+    document.getElementById('eligMax').textContent = 'GHS ' + fmt(elig.final_max ?? elig.effective_max);
+    document.getElementById('eligNote').textContent = elig.note;
+    document.getElementById('eligDetail').innerHTML =
+      `Savings: GHS ${fmt(elig.savings_balance)} × ${Math.round(parseFloat(elig.savings_ratio)*100)}% = GHS ${fmt(elig.max_savings_loan)}` +
+      (collat > 0 ? ` &nbsp;|&nbsp; Collateral: GHS ${fmt(elig.collateral_value_ghs)} × ${Math.round(parseFloat(elig.collateral_ratio)*100)}% = GHS ${fmt(elig.max_collateral_loan)}` : '');
+    // Update max on amount field
+    document.getElementById('loanAmt').max = elig.final_max ?? elig.effective_max;
+  } catch(_) {}
+}
+
+function toggleCollateral() {
+  const has = document.getElementById('hasCollateral').checked;
+  document.getElementById('collateralFields').classList.toggle('d-none', !has);
+  refreshEligibility();
+}
+
+async function submitLoanApp(e) {
+  e.preventDefault();
+  document.getElementById('loanErr').innerHTML = '';
+  try {
+    await api('POST', '/loans/apply', {
+      product_id: document.getElementById('loanProduct').value,
+      principal_ghs: parseFloat(document.getElementById('loanAmt').value),
+      tenure_months: parseInt(document.getElementById('loanTenure').value),
+      disbursement_account: document.getElementById('loanAcct').value || null,
+      disbursement_channel: 'MOBILE_MONEY',
+      purpose: document.getElementById('loanPurpose').value || null,
+      collateral_value_ghs: document.getElementById('hasCollateral').checked
+        ? (parseFloat(document.getElementById('collateralValue').value) || 0) : 0,
+    });
+    bootstrap.Modal.getInstance('#loanModal').hide();
+    toast('Loan application submitted! Our team will review it shortly.');
+    await loadLoans();
+    location.hash = '#loans';
+  } catch (err) {
+    document.getElementById('loanErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+}
+</script>
+</body>
+</html>

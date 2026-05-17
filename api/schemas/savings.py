@@ -3,8 +3,33 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel, Field
+
+
+class SavingsProductCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=100)
+    description: Optional[str] = None
+    interest_rate_pa: Decimal = Field(ge=0, le=Decimal("0.50"), description="Annual rate e.g. 0.08 = 8%")
+    minimum_balance: Decimal = Field(default=Decimal("0"), ge=0)
+    minimum_deposit: Decimal = Field(default=Decimal("0"), ge=0)
+    lock_period_days: int = Field(default=0, ge=0)
+    is_active: bool = True
+
+
+class SavingsProductResponse(BaseModel):
+    id: str
+    name: str
+    description: Optional[str]
+    interest_rate_pa: Decimal
+    minimum_balance: Decimal
+    minimum_deposit: Decimal
+    lock_period_days: int
+    is_active: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
 
 
 class SavingsAccountCreate(BaseModel):

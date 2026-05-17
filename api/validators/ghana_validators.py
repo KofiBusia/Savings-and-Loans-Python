@@ -12,9 +12,10 @@ from typing import Literal
 
 # ─── Ghana Card (NIA) ─────────────────────────────────────────────────────────
 
-# Format: GHA-XXXXXXXXX-X  (GHA + 9 digits + check digit)
+# Format: GHA-XXXXXXXXX-X or GHA-XXXXXXXXX-XX  (GHA + 9 digits + 1-2 digit check)
 # Source: National Identification Authority Act 2006 (Act 707)
-_GHANA_CARD_RE = re.compile(r"^GHA-(\d{9})-(\d)$")
+# NIA issues cards with either a 1- or 2-digit suffix (e.g. -5 or -01).
+_GHANA_CARD_RE = re.compile(r"^GHA-(\d{9})-(\d{1,2})$")
 
 
 def validate_ghana_card(card_number: str) -> str:
@@ -31,9 +32,9 @@ def validate_ghana_card(card_number: str) -> str:
     if not m:
         raise ValueError(
             f"Invalid Ghana Card format '{card_number}'. "
-            "Expected: GHA-XXXXXXXXX-X (9 digits + check digit)"
+            "Expected: GHA-XXXXXXXXX-X or GHA-XXXXXXXXX-XX (9 digits + 1-2 digit check)"
         )
-    digits, check = m.group(1), int(m.group(2))
+    digits, check = m.group(1), int(m.group(2))  # int() strips leading zero (01 → 1)
     if not _luhn_check_digit(digits, check):
         raise ValueError(
             f"Ghana Card '{card_number}' has an invalid check digit. "
