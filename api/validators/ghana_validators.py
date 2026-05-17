@@ -21,8 +21,12 @@ _GHANA_CARD_RE = re.compile(r"^GHA-(\d{9})-(\d{1,2})$")
 def validate_ghana_card(card_number: str) -> str:
     """Validate and normalise a Ghana Card number.
 
+    Validates format only — NIA has not published the check digit algorithm,
+    so digit-level verification is intentionally omitted to avoid rejecting
+    genuine cards.
+
     Raises:
-        ValueError: If the format is invalid or check digit fails.
+        ValueError: If the format does not match GHA-XXXXXXXXX-X(X).
 
     Returns:
         Normalised card number (uppercase, stripped).
@@ -32,29 +36,9 @@ def validate_ghana_card(card_number: str) -> str:
     if not m:
         raise ValueError(
             f"Invalid Ghana Card format '{card_number}'. "
-            "Expected: GHA-XXXXXXXXX-X or GHA-XXXXXXXXX-XX (9 digits + 1-2 digit check)"
-        )
-    digits, check = m.group(1), int(m.group(2))  # int() strips leading zero (01 → 1)
-    if not _luhn_check_digit(digits, check):
-        raise ValueError(
-            f"Ghana Card '{card_number}' has an invalid check digit. "
-            "This may indicate a forged document."
+            "Expected: GHA-XXXXXXXXX-X or GHA-XXXXXXXXX-XX (9 digits + 1–2 digit suffix)"
         )
     return normalised
-
-
-def _luhn_check_digit(digits: str, declared_check: int) -> bool:
-    """Verify NIA check digit using Luhn-variant algorithm."""
-    total = 0
-    for i, ch in enumerate(digits):
-        n = int(ch)
-        if i % 2 == 0:
-            n *= 2
-            if n > 9:
-                n -= 9
-        total += n
-    expected = (10 - (total % 10)) % 10
-    return expected == declared_check
 
 
 # ─── Ghana Phone Numbers ──────────────────────────────────────────────────────
