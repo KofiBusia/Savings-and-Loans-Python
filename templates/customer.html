@@ -386,33 +386,34 @@
 </div><!-- /container -->
 
 <!-- ── Deposit Modal ── -->
-<div class="modal fade" id="depositModal" tabindex="-1">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h6 class="modal-title"><i class="bi bi-plus-circle me-2" style="color:var(--gold);"></i>Make a Deposit</h6>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+<!-- Deposit Panel (inline — no Bootstrap modal, avoids z-index conflicts with Paystack popup) -->
+<div id="depositPanel" style="display:none;position:fixed;inset:0;z-index:1055;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);">
+  <div class="card" style="width:100%;max-width:420px;margin:1rem;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-credit-card me-2" style="color:var(--gold);"></i>Make a Deposit</span>
+      <button class="btn btn-sm btn-link text-secondary p-0" onclick="closeDepositPanel()" style="text-decoration:none;">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info py-2 small mb-3">
+        <i class="bi bi-shield-lock me-1"></i>Secured by <strong>Paystack</strong>. Pay with card, mobile money, or bank transfer.
       </div>
-      <form onsubmit="initiatePaystackDeposit(event)">
-        <div class="modal-body">
-          <div id="depErr"></div>
-          <div class="alert alert-info py-2 small mb-3">
-            <i class="bi bi-shield-lock me-1"></i>Secured by <strong>Paystack</strong>. Pay with card, mobile money, or bank transfer.
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Amount (GHS)</label>
-            <input type="number" id="depAmt" class="form-control" step="0.01" min="1" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Narration (optional)</label>
-            <input type="text" id="depNote" class="form-control" placeholder="e.g. Monthly savings">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-gsl" id="depBtn"><i class="bi bi-credit-card me-1"></i>Pay with Paystack</button>
-        </div>
-      </form>
+      <div id="depErr"></div>
+      <div class="mb-3">
+        <label class="form-label">Amount (GHS)</label>
+        <input type="number" id="depAmt" class="form-control form-control-lg" step="0.01" min="1" placeholder="0.00">
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Narration (optional)</label>
+        <input type="text" id="depNote" class="form-control" placeholder="e.g. Monthly savings">
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-secondary flex-shrink-0" onclick="closeDepositPanel()">Cancel</button>
+        <button id="depBtn" class="btn btn-gsl w-100" onclick="startPaystackDeposit()">
+          <i class="bi bi-credit-card me-1"></i>Pay with Paystack
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -870,17 +871,23 @@ async function loadProfile() {
   }
 }
 
-// ── Deposit (Paystack inline) ────────────────────────────────────────────────
+// ── Deposit (Paystack inline popup — no Bootstrap modal) ─────────────────────
 function openDeposit() {
   document.getElementById('depErr').innerHTML = '';
   document.getElementById('depAmt').value = '';
   document.getElementById('depNote').value = '';
-  const m = bootstrap.Modal.getOrCreateInstance('#depositModal');
-  m.show();
+  const btn = document.getElementById('depBtn');
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
+  document.getElementById('depositPanel').style.display = 'flex';
+  setTimeout(function() { document.getElementById('depAmt').focus(); }, 50);
 }
 
-async function initiatePaystackDeposit(e) {
-  e.preventDefault();
+function closeDepositPanel() {
+  document.getElementById('depositPanel').style.display = 'none';
+}
+
+async function startPaystackDeposit() {
   const errEl = document.getElementById('depErr');
   const btn   = document.getElementById('depBtn');
   errEl.innerHTML = '';
@@ -888,46 +895,69 @@ async function initiatePaystackDeposit(e) {
   const amount_ghs = parseFloat(document.getElementById('depAmt').value);
   const narration  = document.getElementById('depNote').value || null;
 
-  if (!amount_ghs || amount_ghs <= 0) {
-    errEl.innerHTML = '<div class="alert alert-danger py-2">Please enter a valid amount.</div>';
+  if (!amount_ghs || amount_ghs < 1) {
+    errEl.innerHTML = '<div class="alert alert-danger py-2 mb-0">Please enter a valid amount (minimum GHS 1.00).</div>';
+    return;
+  }
+
+  if (typeof PaystackPop === 'undefined') {
+    errEl.innerHTML = '<div class="alert alert-danger py-2 mb-0">Paystack failed to load. Please check your internet connection and refresh the page.</div>';
     return;
   }
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Loading…';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Connecting…';
 
   let init;
   try {
     init = await api('POST', '/savings/my/deposit/initiate', { amount_ghs, narration });
   } catch (err) {
-    errEl.innerHTML = `<div class="alert alert-danger py-2">${err.message}</div>`;
+    errEl.innerHTML = `<div class="alert alert-danger py-2 mb-0">${err.message}</div>`;
     btn.disabled = false;
     btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
     return;
   }
 
-  // Hide the deposit modal, then open Paystack popup after it fully closes
-  const modalEl = document.getElementById('depositModal');
-  const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  // Reset button — panel stays visible; Paystack popup opens on top
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
 
-  function _launchPaystack() {
-    if (typeof PaystackPop === 'undefined') {
-      toast('Paystack is not available. Please check your internet connection and try again.', 'danger');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
-      return;
-    }
+  // Close our panel so only Paystack popup is in view
+  closeDepositPanel();
 
-    PaystackPop.setup({
-      key:      init.public_key,
-      email:    init.email,
-      amount:   init.amount_pesewas,   // pesewas
-      currency: 'GHS',
-      ref:      init.reference,
-      label:    'Crestline S&L Deposit',
-      onClose: function() {
-        // User closed popup — try a delayed verify in case payment completed
-        toast('Payment window closed. Checking status…', 'warning');
+  // Small delay ensures panel hide paint completes before Paystack overlay opens
+  setTimeout(function() {
+    var popup = new PaystackPop();
+    popup.newTransaction({
+      key:       init.public_key,
+      email:     init.email,
+      amount:    init.amount_pesewas,
+      currency:  'GHS',
+      reference: init.reference,
+      label:     'Crestline S&L Deposit',
+      onSuccess: function(transaction) {
+        toast('Payment received — confirming deposit…', 'info');
+        fetch(BASE + '/savings/my/deposit/verify/' + transaction.reference, {
+          headers: { Authorization: 'Bearer ' + Auth.getToken() }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.status === 'CONFIRMED') {
+            toast('GHS ' + amount_ghs.toFixed(2) + ' deposited successfully! Balance updated.', 'success');
+          } else {
+            toast('Payment received — your balance will update shortly.', 'warning');
+          }
+          loadDashboard();
+          loadSavings();
+        })
+        .catch(function() {
+          toast('Payment received. Balance will be updated shortly.', 'warning');
+          loadDashboard();
+          loadSavings();
+        });
+      },
+      onCancel: function() {
+        // User closed Paystack popup — check if payment actually went through
         setTimeout(function() {
           fetch(BASE + '/savings/my/deposit/verify/' + init.reference, {
             headers: { Authorization: 'Bearer ' + Auth.getToken() }
@@ -935,48 +965,20 @@ async function initiatePaystackDeposit(e) {
           .then(function(r) { return r.json(); })
           .then(function(data) {
             if (data.status === 'CONFIRMED') {
-              toast('Deposit of GHS ' + amount_ghs.toFixed(2) + ' confirmed!', 'success');
+              toast('GHS ' + amount_ghs.toFixed(2) + ' deposit confirmed!', 'success');
               loadDashboard();
               loadSavings();
+            } else {
+              toast('Payment cancelled.', 'warning');
             }
           })
-          .catch(function() {});
+          .catch(function() {
+            toast('Payment window closed.', 'warning');
+          });
         }, 2000);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
-      },
-      callback: function(response) {
-        // Paystack signals success — verify on our backend
-        toast('Payment received — confirming deposit…', 'info');
-        fetch(BASE + '/savings/my/deposit/verify/' + response.reference, {
-          headers: { Authorization: 'Bearer ' + Auth.getToken() }
-        })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.status === 'CONFIRMED') {
-            toast('GHS ' + amount_ghs.toFixed(2) + ' deposit confirmed! Balance updated.', 'success');
-          } else {
-            toast('Payment received — balance will update in a moment.', 'warning');
-          }
-          loadDashboard();
-          loadSavings();
-        })
-        .catch(function() {
-          toast('Payment received. Your balance will be updated shortly.', 'warning');
-        });
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
       }
-    }).openIframe();
-  }
-
-  // Wait for Bootstrap modal to fully hide before launching Paystack iframe
-  if (modalEl.classList.contains('show')) {
-    modalEl.addEventListener('hidden.bs.modal', _launchPaystack, { once: true });
-    bsModal.hide();
-  } else {
-    _launchPaystack();
-  }
+    });
+  }, 80);
 }
 
 // ── Withdraw (admin approval required) ──────────────────────────────────────
