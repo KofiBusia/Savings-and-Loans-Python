@@ -136,6 +136,27 @@ function initNav(sections, defaultSection, loader) {
 // ── Simple confirm dialog ────────────────────────────────────────────────────
 function confirm2(msg) { return window.confirm(msg); }
 
+// ── Flatpickr date picker ────────────────────────────────────────────────────
+function initDatePickers(container) {
+  if (typeof flatpickr === 'undefined') return;
+  const root = container instanceof HTMLElement ? container : document;
+  root.querySelectorAll('input[type="date"]:not(.flatpickr-input)').forEach(el => {
+    if (el._flatpickr) return;
+    flatpickr(el, {
+      altInput:           true,
+      altFormat:          'j M Y',       // displays "15 Jan 2025"
+      dateFormat:         'Y-m-d',       // stored/sent as 2025-01-15
+      allowInput:         false,
+      monthSelectorType:  'dropdown',    // fast year/month jump
+      disableMobile:      true,          // always use Flatpickr, not native
+      minDate:            el.min  || null,
+      maxDate:            el.max  || null,
+    });
+  });
+}
+window.addEventListener('load', () => initDatePickers());
+document.addEventListener('shown.bs.modal', e => initDatePickers(e.target));
+
 // ── Table builder helper ─────────────────────────────────────────────────────
 function buildTable(headers, rows) {
   const ths = headers.map(h => `<th>${h}</th>`).join('');

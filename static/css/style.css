@@ -606,6 +606,67 @@ h1, h2, h3, .serif {
 .modal-backdrop { background: #000 !important; }
 .modal-backdrop.show { opacity: 0.75 !important; }
 
+/* Form controls inside modals — explicit background so they're always visible */
+.modal-content .form-control,
+.modal-content .form-select {
+  background: var(--surface2) !important;
+  border-color: rgba(255,255,255,0.15) !important;
+}
+.modal-content .input-group-text {
+  background: var(--surface2) !important;
+  border-color: rgba(255,255,255,0.15) !important;
+}
+.modal-content .form-check-input {
+  background-color: var(--surface2);
+}
+
+/* ════════════════════════════════════════════════
+   FLATPICKR DATE PICKER — dark gold theme
+════════════════════════════════════════════════ */
+.flatpickr-calendar {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+  color: var(--white) !important;
+}
+.flatpickr-calendar.arrowTop::before,
+.flatpickr-calendar.arrowTop::after { border-bottom-color: var(--surface) !important; }
+.flatpickr-months { background: var(--surface2) !important; border-radius: 8px 8px 0 0; }
+.flatpickr-months .flatpickr-month { color: var(--white) !important; fill: var(--white) !important; }
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month { color: var(--gold) !important; fill: var(--gold) !important; }
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover { color: var(--gold2) !important; fill: var(--gold2) !important; }
+.flatpickr-current-month select,
+.flatpickr-current-month .numInputWrapper input {
+  background: transparent !important;
+  color: var(--white) !important;
+  border: none !important;
+  font-weight: 600;
+}
+.flatpickr-current-month select option { background: var(--surface2) !important; color: var(--white) !important; }
+.flatpickr-weekdays { background: var(--surface2) !important; }
+span.flatpickr-weekday { color: var(--gold) !important; background: transparent !important; }
+.flatpickr-day { color: var(--white) !important; border-radius: 5px !important; }
+.flatpickr-day:hover { background: rgba(201,168,76,0.15) !important; border-color: var(--gold) !important; }
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: var(--dark) !important;
+  font-weight: 700;
+}
+.flatpickr-day.today { border-color: rgba(201,168,76,0.5) !important; }
+.flatpickr-day.today:hover { background: rgba(201,168,76,0.2) !important; }
+.flatpickr-day.disabled,
+.flatpickr-day.disabled:hover { color: var(--grey) !important; }
+.numInputWrapper span { border-color: rgba(255,255,255,0.1) !important; }
+.numInputWrapper span svg { fill: var(--grey) !important; }
+/* The alt-input shown to the user */
+.flatpickr-input.form-control[readonly] { cursor: pointer; }
+.flatpickr-input + .form-control { cursor: pointer; }
+
 /* ════════════════════════════════════════════════
    NAV PILLS (tabs)
 ════════════════════════════════════════════════ */
