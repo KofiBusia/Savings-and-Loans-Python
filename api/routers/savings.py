@@ -189,6 +189,7 @@ async def customer_initiate_deposit(
     write_audit(db, table_name="savings_transactions", record_id=txn.id,
                 action="DEPOSIT_INITIATED", actor_id=current_customer.id,
                 data={"amount": str(body.amount_ghs), "reference": reference})
+    db.commit()
 
     return DepositInitiateResponse(
         reference=reference,
@@ -201,7 +202,7 @@ async def customer_initiate_deposit(
 
 
 @router.get("/my/deposit/verify/{reference}", summary="Verify a Paystack deposit (customer)")
-def customer_verify_deposit(
+async def customer_verify_deposit(
     reference: str,
     db: Session = Depends(get_db),
     current_customer: models.Customer = Depends(get_current_customer),
@@ -219,16 +220,16 @@ def customer_verify_deposit(
     if txn.status == "CONFIRMED":
         return {"status": "CONFIRMED", "amount_ghs": str(txn.amount), "balance": str(account.balance)}
 
-    # Manually verify with Paystack if still pending
-    import asyncio
+    # Ask Paystack directly whether payment succeeded
     try:
-        loop = asyncio.get_event_loop()
-        verify = loop.run_until_complete(paystack_gateway.verify(reference))
-        if verify.success:
+        result = await paystack_gateway.verify(reference)
+        if result.success:
             _confirm_paystack_deposit(db, reference)
+            # Re-fetch account to get updated balance
+            db.refresh(account)
             return {"status": "CONFIRMED", "amount_ghs": str(txn.amount), "balance": str(account.balance)}
     except Exception:
-        pass
+        log.exception("paystack_verify_failed ref=%s", reference)
 
     return {"status": txn.status, "amount_ghs": str(txn.amount)}
 
