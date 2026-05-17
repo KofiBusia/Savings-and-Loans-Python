@@ -170,22 +170,22 @@ _templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def login_page(request: Request):
-    return _templates.TemplateResponse("index.html", {"request": request})
+    return _templates.TemplateResponse(request, "index.html")
 
 
 @app.get("/customer", response_class=HTMLResponse, include_in_schema=False)
 def customer_portal(request: Request):
-    return _templates.TemplateResponse("customer.html", {"request": request})
+    return _templates.TemplateResponse(request, "customer.html")
 
 
 @app.get("/staff", response_class=HTMLResponse, include_in_schema=False)
 def staff_portal(request: Request):
-    return _templates.TemplateResponse("staff.html", {"request": request})
+    return _templates.TemplateResponse(request, "staff.html")
 
 
 @app.get("/admin", response_class=HTMLResponse, include_in_schema=False)
 def admin_portal(request: Request):
-    return _templates.TemplateResponse("admin.html", {"request": request})
+    return _templates.TemplateResponse(request, "admin.html")
 
 
 # ─── Main Entry Point ─────────────────────────────────────────────────────────
