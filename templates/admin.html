@@ -134,13 +134,21 @@
       <div class="col-6 col-md-3">
         <div class="stat-card">
           <div class="stat-icon blue"><i class="bi bi-cash-coin"></i></div>
-          <div><div class="stat-value" id="sc-loans">—</div><div class="stat-label">Total Loans</div></div>
+          <div>
+            <div class="stat-value" id="sc-loans">—</div>
+            <div class="stat-label">Total Loans</div>
+            <div class="stat-sub" id="sc-loans-amt" style="color:var(--gold);font-size:0.75rem;margin-top:2px;">GHS —</div>
+          </div>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="stat-card">
           <div class="stat-icon amber"><i class="bi bi-piggy-bank"></i></div>
-          <div><div class="stat-value" id="sc-sav">—</div><div class="stat-label">Savings Accounts</div></div>
+          <div>
+            <div class="stat-value" id="sc-sav">—</div>
+            <div class="stat-label">Savings Accounts</div>
+            <div class="stat-sub" id="sc-deposits-amt" style="color:var(--gold);font-size:0.75rem;margin-top:2px;">GHS —</div>
+          </div>
         </div>
       </div>
       <div class="col-6 col-md-3">
@@ -851,9 +859,12 @@ async function loadSection(sec) {
 async function loadDashboard() {
   try {
     const s = await api('GET', '/admin/system/stats');
+    const fmt = (n) => n.toLocaleString('en-GH', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('sc-cust').textContent    = s.customers.total;
     document.getElementById('sc-loans').textContent   = s.loans.total;
+    document.getElementById('sc-loans-amt').textContent = 'GHS ' + fmt(s.loans.total_disbursed_ghs || 0);
     document.getElementById('sc-sav').textContent     = s.savings.total_accounts;
+    document.getElementById('sc-deposits-amt').textContent = 'GHS ' + fmt(s.savings.total_deposits_ghs || 0);
     document.getElementById('sc-aml').textContent     = s.compliance.open_aml_alerts;
     document.getElementById('sc-active').textContent  = s.loans.active + s.loans.disbursed;
     document.getElementById('sc-overdue').textContent = s.loans.overdue;

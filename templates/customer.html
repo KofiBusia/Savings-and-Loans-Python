@@ -207,6 +207,7 @@
           </div>
           <div class="col-auto"><button type="submit" class="btn btn-sm btn-gsl">Filter</button></div>
           <div class="col-auto"><button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadStatement()">All</button></div>
+          <div class="col-auto"><button type="button" class="btn btn-sm btn-outline-warning" onclick="downloadStatementPDF()"><i class="bi bi-file-earmark-pdf me-1"></i>PDF</button></div>
         </form>
       </div>
     </div>
@@ -782,6 +783,22 @@ async function loadStatement(e) {
   } catch (err) {
     document.getElementById('stmtTable').innerHTML = `<div class="alert alert-danger m-3">${err.message}</div>`;
   }
+}
+
+function downloadStatementPDF() {
+  const token = Auth.getToken();
+  if (!token) { toast('Please log in first', 'warning'); return; }
+  const from = document.getElementById('stmtFrom')?.value;
+  const to   = document.getElementById('stmtTo')?.value;
+  let url = `${BASE}/savings/my/statement/pdf?`;
+  if (from) url += `from_date=${from}T00:00:00&`;
+  if (to)   url += `to_date=${to}T23:59:59&`;
+  // Open in new tab — browser handles print-to-PDF
+  const win = window.open('about:blank', '_blank');
+  fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    .then(r => r.text())
+    .then(html => { win.document.write(html); win.document.close(); })
+    .catch(err => { win.close(); toast('Error generating PDF: ' + err.message, 'danger'); });
 }
 
 // ── Loans ────────────────────────────────────────────────────────────────────

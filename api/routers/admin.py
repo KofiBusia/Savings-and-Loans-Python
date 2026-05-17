@@ -211,6 +211,26 @@ def system_stats(
     db: Session = Depends(get_db),
     _: models.User = Depends(require_roles(*_SUPER_ADMIN)),
 ):
+    from sqlalchemy import func as sqlfunc
+    from decimal import Decimal
+
+    # Total principal across all non-rejected loans (disbursed/active/settled)
+    disbursed_row = db.query(sqlfunc.sum(models.Loan.principal_ghs)).filter(
+        models.Loan.status.in_(["DISBURSED", "ACTIVE", "SETTLED"])
+    ).scalar()
+    total_disbursed_ghs = float(disbursed_row or Decimal("0"))
+
+    # Total confirmed deposit amounts across all savings accounts
+    deposits_row = db.query(sqlfunc.sum(models.SavingsTransaction.amount)).filter(
+        models.SavingsTransaction.type == "DEPOSIT",
+        models.SavingsTransaction.status.in_(["CONFIRMED", "COMPLETED"]),
+    ).scalar()
+    total_deposits_ghs = float(deposits_row or Decimal("0"))
+
+    # Total savings balance across all active accounts
+    balance_row = db.query(sqlfunc.sum(models.SavingsAccount.balance)).filter_by(status="ACTIVE").scalar()
+    total_savings_balance_ghs = float(balance_row or Decimal("0"))
+
     return {
         "customers": {
             "total": db.query(models.Customer).count(),
@@ -224,10 +244,13 @@ def system_stats(
             "disbursed": db.query(models.Loan).filter_by(status="DISBURSED").count(),
             "overdue": db.query(models.Loan).filter(models.Loan.days_past_due > 0).count(),
             "settled": db.query(models.Loan).filter_by(status="SETTLED").count(),
+            "total_disbursed_ghs": total_disbursed_ghs,
         },
         "savings": {
             "total_accounts": db.query(models.SavingsAccount).count(),
             "active_accounts": db.query(models.SavingsAccount).filter_by(status="ACTIVE").count(),
+            "total_deposits_ghs": total_deposits_ghs,
+            "total_balance_ghs": total_savings_balance_ghs,
         },
         "compliance": {
             "open_aml_alerts": db.query(models.AMLAlert).filter_by(status="OPEN").count(),

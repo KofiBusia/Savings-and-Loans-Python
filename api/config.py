@@ -77,8 +77,8 @@ class Settings(BaseSettings):
     mock_ghana_card_api: bool = True
 
     # ── Payment Gateways ──────────────────────────────────────────────────────
-    paystack_secret_key: str = "sk_test_PAYSTACK_KEY"
-    paystack_public_key: str = "pk_test_PAYSTACK_PUBLIC_KEY"
+    paystack_secret_key: str = "sk_test_2ecc25da466efc5a3afb8b200f677aa508e5e60d"
+    paystack_public_key: str = "pk_test_8aa2781eaff1d83fc629fe1a856f7ceaadab00dd"
     flutterwave_secret_key: str = "FLUTTERWAVE_TEST_KEY"
     express_pay_merchant_id: str = "EXPRESS_PAY_MERCHANT"
     express_pay_api_key: str = "EXPRESS_PAY_KEY"

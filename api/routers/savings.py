@@ -13,6 +13,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from api import models
@@ -337,6 +338,141 @@ def my_statement(
         total_transactions=total,
         transactions=transactions,
     )
+
+
+@router.get("/my/statement/pdf", response_class=HTMLResponse,
+            summary="Customer account statement as printable HTML/PDF")
+def my_statement_pdf(
+    from_date: datetime | None = None,
+    to_date: datetime | None = None,
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(get_current_customer),
+):
+    account = db.query(models.SavingsAccount).filter_by(
+        customer_id=current_customer.id, status="ACTIVE"
+    ).first()
+    if not account:
+        raise HTTPException(status_code=404, detail="No active savings account found")
+
+    q = db.query(models.SavingsTransaction).filter(
+        models.SavingsTransaction.account_id == account.id,
+        models.SavingsTransaction.status == "CONFIRMED",
+    )
+    if from_date:
+        q = q.filter(models.SavingsTransaction.created_at >= from_date)
+    if to_date:
+        q = q.filter(models.SavingsTransaction.created_at <= to_date)
+
+    txns = q.order_by(models.SavingsTransaction.created_at.asc()).all()
+    from_label = from_date.strftime("%d %b %Y") if from_date else "Inception"
+    to_label = to_date.strftime("%d %b %Y") if to_date else datetime.utcnow().strftime("%d %b %Y")
+    generated_at = datetime.utcnow().strftime("%d %b %Y %H:%M UTC")
+
+    rows_html = ""
+    for t in txns:
+        cr = f"GHS {t.amount:,.2f}" if t.type in ("DEPOSIT", "INTEREST") else ""
+        dr = f"GHS {t.amount:,.2f}" if t.type not in ("DEPOSIT", "INTEREST") else ""
+        rows_html += f"""<tr>
+          <td>{t.created_at.strftime('%d/%m/%Y')}</td>
+          <td>{t.reference}</td>
+          <td>{t.narration or t.type}</td>
+          <td style="color:#2e7d32;text-align:right;">{cr}</td>
+          <td style="color:#c62828;text-align:right;">{dr}</td>
+          <td style="text-align:right;">GHS {t.balance_after:,.2f}</td>
+        </tr>"""
+
+    if not rows_html:
+        rows_html = '<tr><td colspan="6" style="text-align:center;color:#888;">No transactions in this period</td></tr>'
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Account Statement — {account.account_number}</title>
+<style>
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{ font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #1a1a1a; background: #fff; }}
+  .page {{ max-width: 900px; margin: 0 auto; padding: 32px; }}
+  .header {{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 3px solid #c9a227; padding-bottom: 16px; }}
+  .logo-text {{ font-size: 22px; font-weight: 700; color: #1a1a1a; }}
+  .logo-sub {{ font-size: 10px; color: #555; margin-top: 2px; }}
+  .doc-title {{ font-size: 16px; font-weight: 700; text-align: right; color: #c9a227; }}
+  .doc-sub {{ font-size: 10px; color: #555; text-align: right; margin-top: 4px; }}
+  .meta {{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; background: #f9f6ee; border: 1px solid #e8ddb5; border-radius: 6px; padding: 14px; }}
+  .meta dt {{ font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }}
+  .meta dd {{ font-size: 12px; font-weight: 600; margin-top: 2px; }}
+  .balance-box {{ background: #c9a227; color: #fff; border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }}
+  .balance-box .lbl {{ font-size: 11px; opacity: 0.85; }}
+  .balance-box .val {{ font-size: 20px; font-weight: 700; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 11px; }}
+  thead tr {{ background: #1a1a1a; color: #fff; }}
+  thead th {{ padding: 8px 6px; text-align: left; }}
+  tbody tr:nth-child(even) {{ background: #f7f7f7; }}
+  tbody td {{ padding: 7px 6px; border-bottom: 1px solid #eee; }}
+  .footer {{ margin-top: 24px; font-size: 10px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }}
+  @media print {{
+    .no-print {{ display: none !important; }}
+    body {{ font-size: 11px; }}
+    .page {{ padding: 16px; max-width: 100%; }}
+  }}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print" style="text-align:right;margin-bottom:16px;">
+    <button onclick="window.print()" style="background:#c9a227;color:#fff;border:none;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;">&#128438; Download / Print PDF</button>
+    <button onclick="window.close()" style="background:#555;color:#fff;border:none;padding:8px 16px;border-radius:4px;font-size:13px;cursor:pointer;margin-left:8px;">Close</button>
+  </div>
+
+  <div class="header">
+    <div>
+      <div class="logo-text">{settings.institution_name}</div>
+      <div class="logo-sub">Licence: {settings.bog_licence_number}</div>
+    </div>
+    <div>
+      <div class="doc-title">ACCOUNT STATEMENT</div>
+      <div class="doc-sub">Generated: {generated_at}</div>
+    </div>
+  </div>
+
+  <dl class="meta">
+    <div><dt>Account Number</dt><dd>{account.account_number}</dd></div>
+    <div><dt>Account Name</dt><dd>{current_customer.first_name} {current_customer.last_name}</dd></div>
+    <div><dt>Product</dt><dd>{account.product_name}</dd></div>
+    <div><dt>Statement Period</dt><dd>{from_label} – {to_label}</dd></div>
+    <div><dt>Phone</dt><dd>{current_customer.phone_e164 or '—'}</dd></div>
+    <div><dt>Interest Rate</dt><dd>{float(account.interest_rate_pa)*100:.2f}% p.a.</dd></div>
+  </dl>
+
+  <div class="balance-box">
+    <div><div class="lbl">Current Balance</div><div class="val">GHS {account.balance:,.2f}</div></div>
+    <div style="text-align:right;"><div class="lbl">Total Transactions</div><div class="val">{len(txns)}</div></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Reference</th>
+        <th>Description</th>
+        <th style="text-align:right;">Credit</th>
+        <th style="text-align:right;">Debit</th>
+        <th style="text-align:right;">Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows_html}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    This statement is computer-generated and requires no signature. For queries contact us at {settings.fic_reporting_officer.replace('compliance@', 'support@')}.
+    {settings.institution_name} is licensed by the Bank of Ghana under licence {settings.bog_licence_number}.
+  </div>
+</div>
+</body>
+</html>"""
+    return HTMLResponse(content=html)
 
 
 # ── Admin: Withdrawal approvals ───────────────────────────────────────────────
