@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     uvicorn_workers: int = 4
 
     # ── Institution ───────────────────────────────────────────────────────────
-    institution_name: str = "Ghana Savings & Loans Ltd"
+    institution_name: str = "Crestline Savings and Loans Ltd"
     bog_licence_number: str = "MFI-XXXX/YYYY"
     ghana_data_region: str = "gh-accra-1"
 
@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
-    mfa_totp_issuer: str = "Ghana S&L"
+    mfa_totp_issuer: str = "Crestline S&L"
 
     # ── Admin Seed ────────────────────────────────────────────────────────────
     admin_email: str = "admin@gsl.com.gh"
@@ -87,7 +87,7 @@ class Settings(BaseSettings):
 
     # ── SMS/USSD (mNotify / Hubtel) ───────────────────────────────────────────
     mnotify_api_key: str = "MNOTIFY_KEY"
-    mnotify_sender_id: str = "GSL"
+    mnotify_sender_id: str = "CSL"
     hubtel_sms_client_id: str = "HUBTEL_SMS_ID"
     hubtel_sms_client_secret: str = "HUBTEL_SMS_SECRET"
 

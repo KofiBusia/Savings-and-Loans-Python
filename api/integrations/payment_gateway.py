@@ -145,7 +145,7 @@ class FlutterwaveGateway:
                 "email": req.customer_email,
                 "phone_number": req.customer_phone,
             },
-            "customizations": {"title": "Ghana S&L Payment"},
+            "customizations": {"title": "Crestline S&L Payment"},
         }
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.post(f"{self.BASE}/payments", headers=self._headers, json=payload)

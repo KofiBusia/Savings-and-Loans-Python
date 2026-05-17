@@ -1,5 +1,5 @@
 """
-Ghana Savings & Loans — Production-Ready FastAPI Backend
+Crestline Savings and Loans — Production-Ready FastAPI Backend
 =========================================================
 Entry points:
   Development : python app.py
@@ -87,7 +87,7 @@ def _seed_admin() -> None:
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Ghana Savings & Loans API",
+        title="Crestline Savings and Loans API",
         description=(
             "BoG-licensed savings & loan platform. "
             "Simple interest only (DCD 2025, Clause 14). "
@@ -192,7 +192,7 @@ def admin_portal(request: Request):
 
 if __name__ == "__main__":
     print("=" * 62)
-    print(f"  Ghana Savings & Loans API  v{settings.app_version}")
+    print(f"  Crestline Savings and Loans API  v{settings.app_version}")
     print(f"  Institution : {settings.institution_name}")
     print(f"  BoG Licence : {settings.bog_licence_number}")
     print(f"  Environment : {settings.node_env}")

@@ -1,15 +1,15 @@
-/* Shared utilities for Ghana Savings & Loans web portal */
+/* Shared utilities for Crestline Savings and Loans web portal */
 'use strict';
 
 const BASE = '/api/v1';
 
 // ── Auth helpers ────────────────────────────────────────────────────────────
 const Auth = {
-  getToken:        () => localStorage.getItem('gsl_token'),
-  setToken:        (t) => localStorage.setItem('gsl_token', t),
-  getRefresh:      () => localStorage.getItem('gsl_refresh'),
-  setRefresh:      (t) => localStorage.setItem('gsl_refresh', t),
-  clear:           () => { localStorage.removeItem('gsl_token'); localStorage.removeItem('gsl_refresh'); },
+  getToken:        () => localStorage.getItem('csl_token'),
+  setToken:        (t) => localStorage.setItem('csl_token', t),
+  getRefresh:      () => localStorage.getItem('csl_refresh'),
+  setRefresh:      (t) => localStorage.setItem('csl_refresh', t),
+  clear:           () => { localStorage.removeItem('csl_token'); localStorage.removeItem('csl_refresh'); },
 
   payload() {
     const t = this.getToken();
