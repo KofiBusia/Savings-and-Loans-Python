@@ -78,6 +78,7 @@ class Settings(BaseSettings):
 
     # ── Payment Gateways ──────────────────────────────────────────────────────
     paystack_secret_key: str = "sk_test_PAYSTACK_KEY"
+    paystack_public_key: str = "pk_test_PAYSTACK_PUBLIC_KEY"
     flutterwave_secret_key: str = "FLUTTERWAVE_TEST_KEY"
     express_pay_merchant_id: str = "EXPRESS_PAY_MERCHANT"
     express_pay_api_key: str = "EXPRESS_PAY_KEY"

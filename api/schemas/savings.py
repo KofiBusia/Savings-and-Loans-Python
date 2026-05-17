@@ -5,7 +5,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class SavingsProductCreate(BaseModel):
@@ -109,3 +109,34 @@ class SavingsStatementResponse(BaseModel):
     to_date: datetime | None
     total_transactions: int
     transactions: list[SavingsTransactionResponse]
+
+
+class DepositInitiateResponse(BaseModel):
+    reference: str
+    amount_ghs: Decimal
+    amount_pesewas: int
+    email: str
+    public_key: str
+    transaction_id: str
+
+
+class WithdrawalApprovalResponse(BaseModel):
+    id: str
+    account_id: str
+    customer_id: str
+    amount_ghs: Decimal
+    channel: str | None
+    destination_account: str | None
+    narration: str | None
+    status: str
+    requested_at: datetime
+    reviewed_by: str | None
+    reviewed_at: datetime | None
+    review_note: str | None
+    transaction_id: str | None
+
+    model_config = {"from_attributes": True}
+
+
+class ApprovalDecision(BaseModel):
+    note: str | None = None

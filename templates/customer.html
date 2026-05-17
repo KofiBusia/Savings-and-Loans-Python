@@ -351,20 +351,15 @@
         <h6 class="modal-title"><i class="bi bi-plus-circle me-2" style="color:var(--gold);"></i>Make a Deposit</h6>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <form onsubmit="submitDeposit(event)">
+      <form onsubmit="initiatePaystackDeposit(event)">
         <div class="modal-body">
           <div id="depErr"></div>
+          <div class="alert alert-info py-2 small mb-3">
+            <i class="bi bi-shield-lock me-1"></i>Secured by <strong>Paystack</strong>. Pay with card, mobile money, or bank transfer.
+          </div>
           <div class="mb-3">
             <label class="form-label">Amount (GHS)</label>
             <input type="number" id="depAmt" class="form-control" step="0.01" min="1" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Channel</label>
-            <select id="depChannel" class="form-select">
-              <option value="MOBILE_MONEY">Mobile Money</option>
-              <option value="BANK_TRANSFER">Bank Transfer</option>
-              <option value="CASH">Cash</option>
-            </select>
           </div>
           <div class="mb-3">
             <label class="form-label">Narration (optional)</label>
@@ -373,7 +368,7 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-gsl"><i class="bi bi-check-circle me-1"></i>Confirm Deposit</button>
+          <button type="submit" class="btn btn-gsl" id="depBtn"><i class="bi bi-credit-card me-1"></i>Pay with Paystack</button>
         </div>
       </form>
     </div>
@@ -391,6 +386,9 @@
       <form onsubmit="submitWithdraw(event)">
         <div class="modal-body">
           <div id="wdErr"></div>
+          <div class="alert alert-warning py-2 small mb-3">
+            <i class="bi bi-clock me-1"></i>Withdrawal requests require <strong>admin approval</strong>. You'll be notified once processed.
+          </div>
           <div class="mb-3">
             <label class="form-label">Amount (GHS)</label>
             <input type="number" id="wdAmt" class="form-control" step="0.01" min="1" required>
@@ -409,7 +407,7 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-danger"><i class="bi bi-check-circle me-1"></i>Confirm Withdrawal</button>
+          <button type="submit" class="btn btn-danger"><i class="bi bi-send me-1"></i>Submit Request</button>
         </div>
       </form>
     </div>
@@ -495,6 +493,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://js.paystack.co/v2/inline.js"></script>
 <script src="/static/js/app.js"></script>
 <script>
 'use strict';
@@ -828,30 +827,68 @@ async function loadProfile() {
   }
 }
 
-// ── Deposit / Withdraw ───────────────────────────────────────────────────────
+// ── Deposit (Paystack inline) ────────────────────────────────────────────────
 function openDeposit() {
   document.getElementById('depErr').innerHTML = '';
   document.getElementById('depAmt').value = '';
   new bootstrap.Modal('#depositModal').show();
 }
-async function submitDeposit(e) {
+
+async function initiatePaystackDeposit(e) {
   e.preventDefault();
-  document.getElementById('depErr').innerHTML = '';
+  const errEl = document.getElementById('depErr');
+  const btn   = document.getElementById('depBtn');
+  errEl.innerHTML = '';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Loading…';
+
   try {
-    await api('POST', '/savings/my/deposit', {
-      amount_ghs: parseFloat(document.getElementById('depAmt').value),
-      channel: document.getElementById('depChannel').value,
-      narration: document.getElementById('depNote').value || null,
-    });
+    const amount_ghs = parseFloat(document.getElementById('depAmt').value);
+    const narration  = document.getElementById('depNote').value || null;
+
+    // Step 1: get reference from our backend
+    const init = await api('POST', '/savings/my/deposit/initiate', { amount_ghs, narration });
+
+    // Step 2: close our modal and open Paystack popup
     bootstrap.Modal.getInstance('#depositModal').hide();
-    toast('Deposit successful!');
-    await loadDashboard();
-    await loadSavings();
+
+    const handler = PaystackPop.setup({
+      key:       init.public_key,
+      email:     init.email,
+      amount:    init.amount_pesewas,
+      currency:  'GHS',
+      ref:       init.reference,
+      label:     'Crestline S&L Deposit',
+      onClose: function() {
+        toast('Payment window closed. Your deposit will be confirmed if payment was completed.', 'warning');
+      },
+      callback: async function(response) {
+        // Payment successful on Paystack — verify with our backend
+        try {
+          const result = await api('GET', `/savings/my/deposit/verify/${response.reference}`);
+          if (result.status === 'CONFIRMED') {
+            toast(`Deposit of GHS ${amount_ghs.toFixed(2)} confirmed!`);
+            await loadDashboard();
+            await loadSavings();
+          } else {
+            toast('Payment received — pending confirmation. Refresh in a moment.', 'warning');
+          }
+        } catch {
+          toast('Payment received. Balance will update shortly.', 'warning');
+        }
+      },
+    });
+    handler.openIframe();
+
   } catch (err) {
-    document.getElementById('depErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+    errEl.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
   }
 }
 
+// ── Withdraw (admin approval required) ──────────────────────────────────────
 function openWithdraw() {
   document.getElementById('wdErr').innerHTML = '';
   document.getElementById('wdAmt').value = '';
@@ -867,9 +904,7 @@ async function submitWithdraw(e) {
       narration: document.getElementById('wdNote').value || null,
     });
     bootstrap.Modal.getInstance('#withdrawModal').hide();
-    toast('Withdrawal successful!');
-    await loadDashboard();
-    await loadSavings();
+    toast('Withdrawal request submitted — pending admin approval.', 'info');
   } catch (err) {
     document.getElementById('wdErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
   }

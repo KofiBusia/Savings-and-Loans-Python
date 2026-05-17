@@ -63,6 +63,8 @@ def _migrate_columns() -> None:
         ("loan_products", "savings_ratio", "NUMERIC(5,4) DEFAULT 0.7000"),
         ("loan_products", "collateral_ratio", "NUMERIC(5,4) DEFAULT 0.5000"),
         ("customers", "assigned_officer_id", "VARCHAR(36)"),
+        ("savings_transactions", "paystack_reference", "VARCHAR(100)"),
+        ("savings_transactions", "status", "VARCHAR(20) DEFAULT 'CONFIRMED'"),
     ]
     with engine.connect() as conn:
         for table, col, col_type in _migrations:

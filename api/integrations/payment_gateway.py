@@ -196,26 +196,29 @@ class MockGateway:
 class PaymentGatewayAdapter:
     """
     Unified adapter — selects gateway based on settings.default_payment_gateway.
-    In development/CI, always uses MockGateway regardless of setting.
+    Uses MockGateway only when no real key is configured.
     """
 
     def __init__(self):
-        env = settings.node_env
         gw = settings.default_payment_gateway.upper()
+        has_real_key = (
+            settings.paystack_secret_key.startswith("sk_")
+            and settings.paystack_secret_key != "sk_test_PAYSTACK_KEY"
+        )
 
-        if env in ("development", "test"):
-            self._gw: Any = MockGateway()
-            self._gw_name = "MOCK"
-        elif gw == "PAYSTACK":
-            self._gw = PaystackGateway()
+        if gw == "PAYSTACK" and has_real_key:
+            self._gw: Any = PaystackGateway()
             self._gw_name = "PAYSTACK"
         elif gw == "FLUTTERWAVE":
             self._gw = FlutterwaveGateway()
             self._gw_name = "FLUTTERWAVE"
-        else:
-            log.warning("Unknown gateway %s, falling back to Paystack", gw)
+        elif has_real_key:
             self._gw = PaystackGateway()
             self._gw_name = "PAYSTACK"
+        else:
+            log.warning("No real payment gateway key found — using MockGateway")
+            self._gw = MockGateway()
+            self._gw_name = "MOCK"
 
     async def initiate(self, req: PaymentRequest) -> PaymentResponse:
         log.info("payment_initiate gateway=%s ref=%s amount=%.2f",
@@ -227,5 +230,6 @@ class PaymentGatewayAdapter:
         return await self._gw.verify(reference)
 
 
-# Module-level singleton
+# Module-level singletons
 payment_gateway = PaymentGatewayAdapter()
+paystack_gateway = PaystackGateway()

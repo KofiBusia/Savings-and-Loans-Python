@@ -291,9 +291,39 @@ class SavingsTransaction(Base):
     reversed_at = Column(DateTime(timezone=True))
     reversal_reason = Column(Text)
 
+    # Paystack integration
+    paystack_reference = Column(String(100), nullable=True, index=True)
+    status = Column(String(20), nullable=False, default="CONFIRMED")
+    # PENDING (awaiting Paystack confirmation) | CONFIRMED | FAILED
+
     created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
 
     account = relationship("SavingsAccount", back_populates="transactions")
+
+
+class WithdrawalApproval(Base):
+    """Customer withdrawal requests pending admin approval."""
+    __tablename__ = "withdrawal_approvals"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=_uuid)
+    account_id = Column(UUID(as_uuid=False), ForeignKey("savings_accounts.id"), nullable=False, index=True)
+    customer_id = Column(UUID(as_uuid=False), ForeignKey("customers.id"), nullable=False, index=True)
+    amount_ghs = Column(Numeric(18, 2), nullable=False)
+    channel = Column(String(30), default="MOBILE_MONEY")
+    destination_account = Column(String(100))
+    narration = Column(Text)
+
+    status = Column(String(20), nullable=False, default="PENDING")
+    # PENDING | APPROVED | REJECTED
+
+    requested_at = Column(DateTime(timezone=True), default=_now, nullable=False)
+    reviewed_by = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=True)
+    reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    review_note = Column(Text, nullable=True)
+    transaction_id = Column(UUID(as_uuid=False), ForeignKey("savings_transactions.id"), nullable=True)
+
+    account = relationship("SavingsAccount")
+    customer = relationship("Customer")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
