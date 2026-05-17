@@ -1,0 +1,103 @@
+# Ghana Savings & Loans — Python/FastAPI/Windows .gitignore
+
+# ── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+*.env
+secrets/
+credentials/
+*.pem
+*.key
+*.crt
+*.p12
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.whl
+.installed.cfg
+MANIFEST
+
+# ── Virtual Environments ──────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# ── Testing & Coverage ────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+coverage.xml
+*.cover
+.cache
+test.db
+
+# ── VS Code ───────────────────────────────────────────────────────────────────
+.vscode/settings.json.local
+.history/
+*.vsix
+
+# ── Database ──────────────────────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+migrations/versions/*.pyc
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+log/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+.docker/
+
+# ── Uploads & Generated Files ─────────────────────────────────────────────────
+uploads/
+media/
+static/uploads/
+reports/generated/
+*.pdf
+*.xlsx
+*.xml.generated
+
+# ── Security Scan Outputs ─────────────────────────────────────────────────────
+bandit-report.json
+safety-report.json
+
+# ── Alembic (keep versions, ignore pyc) ──────────────────────────────────────
+# migrations/versions/*.py  ← DO NOT ignore — these must be committed
+alembic.ini.local
+
+# ── Compliance Reports (PII — must never be committed) ───────────────────────
+compliance_reports/
+fic_submissions/
+bureau_submissions/
+audit_exports/

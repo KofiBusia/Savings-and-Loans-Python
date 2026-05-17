@@ -1,0 +1,58 @@
+# Ghana Savings & Loans — Pinned Production Dependencies
+# Last reviewed: 2025-05
+# Run: pip install -r requirements.txt
+# Security audit: safety check -r requirements.txt
+
+# ── Web Framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+starlette==0.41.3
+python-multipart==0.0.12
+
+# ── Database ──────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.36
+alembic==1.14.0
+psycopg2-binary==2.9.10
+
+# ── Validation & Settings ─────────────────────────────────────────────────────
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# ── Auth & Cryptography ───────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography==44.0.0
+pyotp==2.9.0
+
+# ── HTTP Client (integrations) ────────────────────────────────────────────────
+httpx==0.28.1
+anyio==4.7.0
+
+# ── Task Queue ────────────────────────────────────────────────────────────────
+celery==5.4.0
+redis==5.2.1
+
+# ── Image Processing (Ghana Card OCR, QR) ────────────────────────────────────
+Pillow==11.0.0
+qrcode[pil]==8.0
+
+# ── XML (FIC STR/CTR reporting) ───────────────────────────────────────────────
+lxml==5.3.0
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+structlog==24.4.0
+
+# ── Monitoring ────────────────────────────────────────────────────────────────
+sentry-sdk[fastapi]==2.19.2
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+httpx==0.28.1   # also used as test client
+
+# ── Code Quality ─────────────────────────────────────────────────────────────
+ruff==0.8.3
+bandit==1.8.0
+safety==3.2.11

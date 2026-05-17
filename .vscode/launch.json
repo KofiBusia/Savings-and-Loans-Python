@@ -1,0 +1,96 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Ghana S&L API (app.py)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/app.py",
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development",
+        "DATABASE_URL": "postgresql+psycopg2://gsl:gsl_dev@localhost:5432/gsl_db",
+        "SECRET_KEY": "dev-secret-key-do-not-use-in-production",
+        "MOCK_GHIPSS": "true",
+        "MOCK_CREDIT_BUREAUS": "true",
+        "MOCK_GHANA_CARD_API": "true",
+        "ADMIN_EMAIL": "admin@gsl.com.gh",
+        "ADMIN_PASSWORD": "Admin@1234!",
+        "INSTITUTION_NAME": "Ghana S&L Dev",
+        "BOG_LICENCE_NUMBER": "MFI-XXXX/YYYY"
+      },
+      "justMyCode": false,
+      "args": []
+    },
+    {
+      "name": "Ghana S&L API (uvicorn reload)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app:app",
+        "--reload",
+        "--port", "8000",
+        "--host", "0.0.0.0",
+        "--log-level", "debug"
+      ],
+      "env": {
+        "NODE_ENV": "development",
+        "DATABASE_URL": "postgresql+psycopg2://gsl:gsl_dev@localhost:5432/gsl_db",
+        "SECRET_KEY": "dev-secret-key-do-not-use-in-production",
+        "MOCK_GHIPSS": "true",
+        "MOCK_CREDIT_BUREAUS": "true",
+        "MOCK_GHANA_CARD_API": "true"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Pytest — Compliance Tests Only",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/test_compliance_guards.py",
+        "-v", "--tb=short", "-s"
+      ],
+      "env": {
+        "NODE_ENV": "test",
+        "DATABASE_URL": "sqlite:///./test.db",
+        "SECRET_KEY": "test-secret-key",
+        "MOCK_GHIPSS": "true",
+        "MOCK_CREDIT_BUREAUS": "true",
+        "MOCK_GHANA_CARD_API": "true"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Pytest — All Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/", "-v", "--tb=short"],
+      "env": {
+        "NODE_ENV": "test",
+        "DATABASE_URL": "sqlite:///./test.db",
+        "SECRET_KEY": "test-secret-key",
+        "MOCK_GHIPSS": "true",
+        "MOCK_CREDIT_BUREAUS": "true",
+        "MOCK_GHANA_CARD_API": "true"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Alembic — Generate Migration",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "alembic",
+      "args": ["revision", "--autogenerate", "-m", "migration"],
+      "env": {
+        "DATABASE_URL": "postgresql+psycopg2://gsl:gsl_dev@localhost:5432/gsl_db",
+        "SECRET_KEY": "dev-secret"
+      },
+      "console": "integratedTerminal"
+    }
+  ]
+}
