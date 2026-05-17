@@ -160,6 +160,66 @@ def my_commission_summary(
     return _build_summary(db, current_user.id, current_user.full_name)
 
 
+@router.get("/my/performance", summary="Loan officer performance dashboard")
+def my_performance(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Returns performance KPIs for the currently logged-in loan officer."""
+    # Customers assigned to this officer
+    assigned = db.query(models.Customer).filter_by(
+        assigned_officer_id=current_user.id
+    ).all()
+    customer_ids = [c.id for c in assigned]
+
+    # Loans originated by this officer (applied_by)
+    originated = db.query(models.Loan).filter_by(applied_by=current_user.id).all()
+
+    # Loan status breakdown for assigned customers
+    if customer_ids:
+        from sqlalchemy import and_
+        cust_loans = db.query(models.Loan).filter(
+            models.Loan.customer_id.in_(customer_ids)
+        ).all()
+    else:
+        cust_loans = []
+
+    active   = sum(1 for l in cust_loans if l.status in ("DISBURSED", "ACTIVE"))
+    overdue  = sum(1 for l in cust_loans if l.days_past_due and l.days_past_due > 0)
+    settled  = sum(1 for l in cust_loans if l.status == "SETTLED")
+    total_cl = len(cust_loans)
+    collection_rate = round(settled / total_cl * 100, 1) if total_cl else 0.0
+
+    # Commission totals
+    comms   = db.query(models.LoanOfficerCommission).filter_by(officer_id=current_user.id).all()
+    pending = sum(c.commission_amount for c in comms if c.status == "PENDING") or Decimal("0")
+    paid    = sum(c.commission_amount for c in comms if c.status == "PAID")    or Decimal("0")
+
+    # Recent repayments collected (last 30 days)
+    from datetime import timedelta
+    cutoff = datetime.utcnow() - timedelta(days=30)
+    recent_collections = db.query(models.LoanRepayment).filter(
+        models.LoanRepayment.collected_by == current_user.id,
+        models.LoanRepayment.created_at >= cutoff,
+    ).count()
+
+    return {
+        "officer_name": current_user.full_name or current_user.email,
+        "customers_assigned": len(assigned),
+        "loans_originated": len(originated),
+        "active_loans": active,
+        "overdue_loans": overdue,
+        "settled_loans": settled,
+        "total_loans": total_cl,
+        "collection_rate_pct": collection_rate,
+        "collections_last_30d": recent_collections,
+        "commission_pending": float(pending),
+        "commission_paid": float(paid),
+        "commission_total": float(pending + paid),
+        "commission_count": len(comms),
+    }
+
+
 @router.get("/officer/{officer_id}", response_model=list[CommissionResponse],
             summary="View commissions for a specific officer (admin)")
 def officer_commissions(

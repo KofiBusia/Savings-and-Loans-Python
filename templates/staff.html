@@ -89,8 +89,9 @@
 
   <!-- ══════════════ DASHBOARD ══════════════ -->
   <div id="sec-dashboard">
-    <div class="section-title">Dashboard</div>
+    <div class="section-title" id="dashTitle">Dashboard</div>
 
+    <!-- System-wide stats (admin/credit manager view) -->
     <div class="row g-3 mb-4" id="statsRow">
       <div class="col-6 col-md-3">
         <div class="stat-card">
@@ -114,6 +115,85 @@
         <div class="stat-card">
           <div class="stat-icon amber"><i class="bi bi-piggy-bank"></i></div>
           <div><div class="stat-value" id="st-savings">—</div><div class="stat-label">Savings Accounts</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loan Officer Performance Panel (only for FIELD_OFFICER role) -->
+    <div id="officerPerfPanel" class="d-none mb-4">
+      <div style="font-size:1rem;font-weight:600;color:var(--gold);margin-bottom:1rem;font-family:'Cormorant Garamond',serif;letter-spacing:0.05em;">
+        <i class="bi bi-graph-up-arrow me-2"></i>My Performance Dashboard
+      </div>
+      <!-- KPI cards row 1 -->
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-person-check"></i></div>
+            <div><div class="stat-value" id="pf-cust">—</div><div class="stat-label">My Customers</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-file-earmark-plus"></i></div>
+            <div><div class="stat-value" id="pf-orig">—</div><div class="stat-label">Loans Originated</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+            <div><div class="stat-value" id="pf-active">—</div><div class="stat-label">Active Loans</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon red"><i class="bi bi-exclamation-circle"></i></div>
+            <div><div class="stat-value" id="pf-overdue">—</div><div class="stat-label">Overdue</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-check-all"></i></div>
+            <div><div class="stat-value" id="pf-settled">—</div><div class="stat-label">Settled</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-receipt"></i></div>
+            <div><div class="stat-value" id="pf-collections">—</div><div class="stat-label">Collections (30d)</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Commission + collection rate row -->
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card" style="border:1px solid rgba(212,160,23,0.3);">
+            <div class="card-body text-center">
+              <div style="color:var(--grey);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;">Collection Rate</div>
+              <div id="pf-rate" style="font-size:3rem;font-family:'Cormorant Garamond',serif;color:var(--gold);line-height:1.1;">—%</div>
+              <div style="color:var(--grey);font-size:0.72rem;">Settled / Total loans for my customers</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="card" style="border:1px solid rgba(212,160,23,0.3);">
+            <div class="card-header"><i class="bi bi-percent me-2" style="color:var(--gold);"></i><strong>Commission Earnings</strong></div>
+            <div class="card-body">
+              <div class="row g-3 text-center">
+                <div class="col-4">
+                  <div style="color:var(--grey);font-size:0.72rem;text-transform:uppercase;">Total Earned</div>
+                  <div id="pf-comm-total" style="font-size:1.6rem;font-family:'Cormorant Garamond',serif;color:var(--gold);">—</div>
+                </div>
+                <div class="col-4">
+                  <div style="color:var(--grey);font-size:0.72rem;text-transform:uppercase;">Pending</div>
+                  <div id="pf-comm-pending" style="font-size:1.6rem;font-family:'Cormorant Garamond',serif;color:#fbbf24;">—</div>
+                </div>
+                <div class="col-4">
+                  <div style="color:var(--grey);font-size:0.72rem;text-transform:uppercase;">Paid Out</div>
+                  <div id="pf-comm-paid" style="font-size:1.6rem;font-family:'Cormorant Garamond',serif;color:#4ade80;">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -533,9 +613,10 @@ async function loadSection(sec) {
 // ── Dashboard ────────────────────────────────────────────────────────────────
 async function loadDashboard() {
   try {
-    const [custs, loans] = await Promise.all([
+    const [custs, loans, me] = await Promise.all([
       api('GET', '/customers?page_size=5'),
       api('GET', '/loans?status=APPLICATION&page_size=5'),
+      api('GET', '/auth/me'),
     ]);
 
     try {
@@ -546,6 +627,34 @@ async function loadDashboard() {
       document.getElementById('st-savings').textContent = stats.savings.active_accounts;
     } catch {
       document.getElementById('st-customers').textContent = custs?.total || '—';
+    }
+
+    // Loan officer performance panel
+    const isOfficer = (me?.roles||[]).includes('FIELD_OFFICER');
+    if (isOfficer) {
+      document.getElementById('dashTitle').textContent = `Dashboard — ${me.full_name || me.email}`;
+      document.getElementById('officerPerfPanel').classList.remove('d-none');
+      try {
+        const perf = await api('GET', '/commissions/my/performance');
+        document.getElementById('pf-cust').textContent      = perf.customers_assigned;
+        document.getElementById('pf-orig').textContent      = perf.loans_originated;
+        document.getElementById('pf-active').textContent    = perf.active_loans;
+        document.getElementById('pf-overdue').textContent   = perf.overdue_loans;
+        document.getElementById('pf-settled').textContent   = perf.settled_loans;
+        document.getElementById('pf-collections').textContent = perf.collections_last_30d;
+        document.getElementById('pf-rate').textContent      = perf.collection_rate_pct + '%';
+        document.getElementById('pf-comm-total').textContent   = fmt(perf.commission_total);
+        document.getElementById('pf-comm-pending').textContent = fmt(perf.commission_pending);
+        document.getElementById('pf-comm-paid').textContent    = fmt(perf.commission_paid);
+
+        // Colour collection rate
+        const rateEl = document.getElementById('pf-rate');
+        rateEl.style.color = perf.collection_rate_pct >= 80 ? '#4ade80'
+                           : perf.collection_rate_pct >= 50 ? '#fbbf24' : '#f87171';
+      } catch (e) {
+        document.getElementById('officerPerfPanel').innerHTML +=
+          `<div class="alert alert-warning mt-2">Performance data unavailable: ${e.message}</div>`;
+      }
     }
 
     const items = custs?.items || [];
