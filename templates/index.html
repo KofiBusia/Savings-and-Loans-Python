@@ -139,12 +139,12 @@
     <!-- Tab selector -->
     <ul class="nav nav-pills nav-fill mb-4" id="loginTabs">
       <li class="nav-item">
-        <a class="nav-link active" id="tab-staff" href="#" onclick="switchTab('staff');return false;">
+        <a class="nav-link" id="tab-staff" href="#" onclick="switchTab('staff');return false;">
           <i class="bi bi-person-badge me-1"></i>Staff Login
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" id="tab-customer" href="#" onclick="switchTab('customer');return false;">
+        <a class="nav-link active" id="tab-customer" href="#" onclick="switchTab('customer');return false;">
           <i class="bi bi-person me-1"></i>Customer Login
         </a>
       </li>
@@ -153,7 +153,7 @@
     <div id="errBox"></div>
 
     <!-- Staff login form -->
-    <form id="staffForm" onsubmit="loginStaff(event)">
+    <form id="staffForm" class="d-none" onsubmit="loginStaff(event)">
       <div class="mb-3">
         <label class="form-label">Email Address</label>
         <div class="input-group">
@@ -195,7 +195,7 @@
     </form>
 
     <!-- Customer login form -->
-    <form id="customerForm" class="d-none" onsubmit="loginCustomer(event)">
+    <form id="customerForm" onsubmit="loginCustomer(event)">
       <div class="mb-3">
         <label class="form-label">Phone Number</label>
         <div class="input-group">
@@ -281,7 +281,7 @@
 <script>
 'use strict';
 
-let currentTab = 'staff';
+let currentTab = 'customer';
 let pendingEmail = '';
 
 function switchTab(tab) {
