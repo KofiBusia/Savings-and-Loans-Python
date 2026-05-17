@@ -288,7 +288,7 @@
     </div>
 
     <!-- KYC Form -->
-    <div id="kyc-form">
+    <div id="kyc-form" class="d-none">
       <div class="section-title"><i class="bi bi-person-vcard me-2" style="color:var(--gold);"></i>Complete Your KYC Verification</div>
       <div class="alert mb-4" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);color:var(--white);font-size:0.85rem;">
         <i class="bi bi-info-circle me-2" style="color:var(--gold);"></i>
@@ -640,26 +640,52 @@ async function loadKYC() {
   document.getElementById('kyc-rejected').classList.add('d-none');
   document.getElementById('kyc-form').classList.add('d-none');
 
-  // Re-fetch status in case it changed (e.g. after submission)
+  let p = null;
   try {
-    const p = await api('GET', '/customers/me/profile');
+    p = await api('GET', '/customers/me/profile');
     _kycStatus = p.kyc_status;
     _isActive  = p.is_active;
-  } catch (_) {}
+  } catch (e) {
+    // Show the form anyway so new clients aren't stuck on a blank page
+    document.getElementById('kyc-form').classList.remove('d-none');
+    _loadSavingsProducts();
+    return;
+  }
 
   if (_isActive || _kycStatus === 'ACTIVE') {
-    // Already active — go to dashboard
     location.hash = '#dashboard';
     return;
   }
   if (_kycStatus === 'PENDING_REVIEW') {
     document.getElementById('kyc-waiting').classList.remove('d-none');
-  } else if (_kycStatus === 'REJECTED') {
-    document.getElementById('kyc-rejected').classList.remove('d-none');
-  } else {
-    document.getElementById('kyc-form').classList.remove('d-none');
-    _loadSavingsProducts();
+    return;
   }
+  if (_kycStatus === 'REJECTED') {
+    document.getElementById('kyc-rejected').classList.remove('d-none');
+    return;
+  }
+  // PENDING_GHANA_CARD or any other status — show the form pre-filled
+  document.getElementById('kyc-form').classList.remove('d-none');
+  _prefillKYCForm(p);
+  _loadSavingsProducts();
+}
+
+function showKYCForm() {
+  document.getElementById('kyc-rejected').classList.add('d-none');
+  document.getElementById('kyc-form').classList.remove('d-none');
+  _loadSavingsProducts();
+}
+
+function _prefillKYCForm(p) {
+  if (!p) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+  set('kycDob', p.date_of_birth ? p.date_of_birth.substring(0, 10) : null);
+  set('kycGender', p.gender);
+  set('kycAddress', p.residential_address);
+  set('kycRegion', p.region);
+  set('kycDistrict', p.district);
+  set('kycOccupation', p.occupation);
+  set('kycIncome', p.monthly_income_ghs);
 }
 
 function showKYCForm() {

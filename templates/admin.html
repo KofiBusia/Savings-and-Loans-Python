@@ -9,10 +9,16 @@
   <link href="/static/css/style.css" rel="stylesheet">
   <style>
     body { background: var(--dark2); padding-top: 34px; }
-    @media (max-width: 767px) {
+    @media (max-width: 768px) {
       body { padding-top: 50px; }
-      .sidebar { z-index: 150; }
-      .sidebar.mobile-open { transform: none !important; }
+      .sidebar {
+        top: 0 !important;
+        height: 100vh !important;
+        z-index: 1050 !important;
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
     }
   </style>
 </head>
@@ -81,7 +87,7 @@
 
 <!-- Backdrop for mobile sidebar -->
 <div id="sidebarBackdrop" onclick="closeAdminSidebar()"
-     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:149;"></div>
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1049;"></div>
 
 <!-- ── Sidebar ── -->
 <nav class="sidebar" id="adminSidebar">
@@ -510,6 +516,32 @@
 
 </div><!-- /main-content -->
 
+<!-- ── Assign Officer Modal ── -->
+<div class="modal fade" id="assignOfficerModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title"><i class="bi bi-person-badge me-2" style="color:var(--gold);"></i>Assign Field Officer</h6>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="aoErr"></div>
+        <p class="small mb-3" id="aoCustomerName" style="color:var(--grey);"></p>
+        <div class="mb-3">
+          <label class="form-label">Select Officer</label>
+          <select id="aoOfficerSel" class="form-select">
+            <option value="">— Unassign —</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-gsl btn-sm" onclick="assignOfficer()"><i class="bi bi-check-lg me-1"></i>Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Create Staff User Modal ── -->
 <div class="modal fade" id="createUserModal" tabindex="-1">
   <div class="modal-dialog">
@@ -521,11 +553,6 @@
       <form onsubmit="createUser(event)">
         <div class="modal-body">
           <div id="cuErr"></div>
-          <div class="alert alert-info" style="font-size:0.78rem;">Creating a staff user requires MFA. Enter your current 6-digit code.</div>
-          <div class="mb-3">
-            <label class="form-label">Your MFA Code *</label>
-            <input type="text" id="cuMFA" class="form-control" maxlength="6" pattern="\d{6}" inputmode="numeric" required>
-          </div>
           <div class="mb-3"><label class="form-label">Full Name *</label><input type="text" id="cuName" class="form-control" required></div>
           <div class="mb-3"><label class="form-label">Email *</label><input type="email" id="cuEmail" class="form-control" required></div>
           <div class="mb-3">
@@ -948,18 +975,15 @@ async function createUser(e) {
   document.getElementById('cuErr').innerHTML = '';
   const roles = Array.from(document.querySelectorAll('#createUserModal input[type=checkbox]:checked')).map(cb => cb.value);
   if (!roles.length) { document.getElementById('cuErr').innerHTML = '<div class="alert alert-warning">Select at least one role</div>'; return; }
-  const mfa = document.getElementById('cuMFA').value;
   try {
-    const headers = mfa ? { 'X-MFA-Token': mfa } : {};
     await api('POST', '/admin/users', {
       full_name:   document.getElementById('cuName').value,
       email:       document.getElementById('cuEmail').value,
       password:    document.getElementById('cuPass').value,
       roles,
       branch_code: document.getElementById('cuBranch').value || null,
-    }, { headers });
+    });
     bootstrap.Modal.getInstance('#createUserModal').hide();
-    document.getElementById('cuMFA').value = '';
     toast('Staff user created!');
     await loadUsers();
   } catch (err) {
@@ -1153,21 +1177,27 @@ async function loadAdminCustomers(all = false) {
     const data  = await api('GET', url);
     const items = data?.items || [];
     document.getElementById('adCustTable').innerHTML = buildTable(
-      ['Account #','Name','Phone','KYC','Risk','Status','Created','Actions'],
+      ['Account #','Name','Phone','KYC','Officer','Status','Actions'],
       items.map(c => [
         `<code class="small">${c.account_number}</code>`,
         `${c.first_name} ${c.last_name}`,
         c.phone_e164,
         badge(c.kyc_status),
-        c.risk_level || '—',
+        c.assigned_officer_id
+          ? `<span class="badge bg-info text-dark" title="${c.assigned_officer_id}"><i class="bi bi-person-check me-1"></i>Assigned</span>`
+          : '<span class="badge bg-secondary">Unassigned</span>',
         c.is_suspended
           ? '<span class="badge bg-danger">Suspended</span>'
           : (c.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'),
-        fmtD(c.created_at),
-        c.kyc_status === 'PENDING_REVIEW'
-          ? `<button class="btn btn-xs btn-success me-1" onclick="approveKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-check-lg"></i> Approve</button>
-             <button class="btn btn-xs btn-danger" onclick="rejectKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-x-lg"></i> Reject</button>`
-          : '—'
+        `<div class="d-flex gap-1 flex-wrap">
+          ${c.kyc_status === 'PENDING_REVIEW'
+            ? `<button class="btn btn-xs btn-success" onclick="approveKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-check-lg"></i> Approve</button>
+               <button class="btn btn-xs btn-danger" onclick="rejectKYC('${c.id}','${c.first_name} ${c.last_name}')"><i class="bi bi-x-lg"></i> Reject</button>`
+            : ''}
+          <button class="btn btn-xs btn-outline-info" onclick="openAssignOfficer('${c.id}','${c.first_name} ${c.last_name}','${c.assigned_officer_id||''}')">
+            <i class="bi bi-person-badge"></i> Assign
+          </button>
+        </div>`
       ])
     );
     if (!items.length) document.getElementById('adCustTable').innerHTML =
@@ -1243,6 +1273,48 @@ async function rejectKYC(customerId, name) {
     await loadPendingKYC();
     await loadAdminCustomers(true);
   } catch (err) { toast('Reject failed: ' + err.message, 'danger'); }
+}
+
+// ── Assign Officer ────────────────────────────────────────────────────────────
+let _aoCustomerId = null;
+
+async function openAssignOfficer(customerId, customerName, currentOfficerId) {
+  _aoCustomerId = customerId;
+  document.getElementById('aoErr').innerHTML = '';
+  document.getElementById('aoCustomerName').textContent = `Customer: ${customerName}`;
+
+  // Load field officers
+  const sel = document.getElementById('aoOfficerSel');
+  sel.innerHTML = '<option value="">— Unassign —</option>';
+  try {
+    const data = await api('GET', '/admin/users?role=FIELD_OFFICER&page_size=100');
+    const officers = data?.items || data || [];
+    officers.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.id;
+      opt.textContent = `${o.full_name || o.email} (${o.branch_code || 'No branch'})`;
+      if (o.id === currentOfficerId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  } catch (err) {
+    document.getElementById('aoErr').innerHTML = `<div class="alert alert-danger alert-sm">${err.message}</div>`;
+  }
+  new bootstrap.Modal('#assignOfficerModal').show();
+}
+
+async function assignOfficer() {
+  const officerId = document.getElementById('aoOfficerSel').value;
+  try {
+    const url = officerId
+      ? `/customers/${_aoCustomerId}/assign-officer?officer_id=${officerId}`
+      : `/customers/${_aoCustomerId}/assign-officer`;
+    await api('PUT', url);
+    bootstrap.Modal.getInstance('#assignOfficerModal').hide();
+    toast(officerId ? 'Officer assigned.' : 'Officer unassigned.', 'success');
+    await loadAdminCustomers();
+  } catch (err) {
+    document.getElementById('aoErr').innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
 }
 
 // ── Admin Loans ───────────────────────────────────────────────────────────────

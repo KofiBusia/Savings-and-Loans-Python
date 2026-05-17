@@ -399,14 +399,24 @@ def approve_kyc(
     customer.kyc_completed_at = datetime.utcnow()
 
     savings = db.query(models.SavingsAccount).filter_by(customer_id=customer_id).first()
-    if savings:
-        savings.status = "ACTIVE"
-        if customer.savings_product_id:
-            product = db.query(models.SavingsProduct).filter_by(id=customer.savings_product_id).first()
-            if product:
-                savings.product_name = product.name
-                savings.interest_rate_pa = product.interest_rate_pa
-                savings.minimum_balance = product.minimum_balance
+    if not savings:
+        # Create savings account if staff/self-registration skipped it
+        savings = models.SavingsAccount(
+            customer_id=customer_id,
+            account_number=generate_account_number("SAV"),
+            product_name="Regular Savings",
+            status="PENDING_ACTIVATION",
+        )
+        db.add(savings)
+        db.flush()
+
+    savings.status = "ACTIVE"
+    if customer.savings_product_id:
+        product = db.query(models.SavingsProduct).filter_by(id=customer.savings_product_id).first()
+        if product:
+            savings.product_name = product.name
+            savings.interest_rate_pa = product.interest_rate_pa
+            savings.minimum_balance = product.minimum_balance
 
     db.commit()
 
@@ -443,6 +453,29 @@ def reject_kyc(
                 data={"reason": reason, "kyc_status": "REJECTED"})
     db.commit()
 
+    return customer
+
+
+# ─── Assign Officer ────────────────────────────────────────────────────────────
+
+@router.put("/{customer_id}/assign-officer", response_model=CustomerResponse,
+            summary="Assign or unassign a field officer to a customer")
+def assign_officer(
+    customer_id: str,
+    officer_id: str | None = Query(default=None, description="Officer user ID; omit to unassign"),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_roles("FIELD_OFFICER", "ADMIN", "SUPER_ADMIN")),
+):
+    customer = _get_or_404(db, customer_id)
+    if officer_id:
+        officer = db.query(models.User).filter_by(id=officer_id).first()
+        if not officer:
+            raise HTTPException(status_code=404, detail="Officer not found")
+    customer.assigned_officer_id = officer_id
+    db.commit()
+    write_audit(db, table_name="customers", record_id=customer.id,
+                action="OFFICER_ASSIGNED", actor_id=current_user.id,
+                data={"officer_id": officer_id})
     return customer
 
 
