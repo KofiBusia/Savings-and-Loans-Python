@@ -9,6 +9,11 @@
   <link href="/static/css/style.css" rel="stylesheet">
   <style>
     body { background: var(--dark2); padding-top: 34px; }
+    @media (max-width: 767px) {
+      body { padding-top: 50px; }
+      .sidebar { z-index: 150; }
+      .sidebar.mobile-open { transform: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -59,8 +64,27 @@
   </div>
 </div>
 
+<!-- ── Mobile top bar (hamburger) — hidden on desktop ── -->
+<div id="adminMobileBar" class="d-flex d-md-none align-items-center justify-content-between px-3"
+     style="position:fixed;top:0;left:0;right:0;height:50px;background:var(--dark);
+            border-bottom:1px solid var(--border);z-index:150;">
+  <div class="brand-logo" style="font-size:0.82rem;gap:8px;">
+    <div class="logo-box" style="width:28px;height:28px;font-size:0.82rem;background:var(--gold);color:var(--dark);">
+      <i class="bi bi-shield-lock"></i>
+    </div>
+    <strong style="color:var(--white);">CSL Admin</strong>
+  </div>
+  <button class="btn btn-sm btn-outline-light" onclick="openAdminSidebar()" aria-label="Open menu">
+    <i class="bi bi-list fs-5"></i>
+  </button>
+</div>
+
+<!-- Backdrop for mobile sidebar -->
+<div id="sidebarBackdrop" onclick="closeAdminSidebar()"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:149;"></div>
+
 <!-- ── Sidebar ── -->
-<nav class="sidebar">
+<nav class="sidebar" id="adminSidebar">
   <div class="sidebar-brand">
     <a class="brand-logo" href="/admin">
       <div class="logo-box" style="background:var(--gold);color:var(--dark);"><i class="bi bi-shield-lock"></i></div>
@@ -72,16 +96,16 @@
   </div>
 
   <ul class="sidebar-nav nav flex-column mt-1">
-    <li class="nav-item"><a class="nav-link" href="#dashboard"  data-section="dashboard"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
-    <li class="nav-item"><a class="nav-link" href="#users"      data-section="users"><i class="bi bi-person-badge"></i>Staff Users</a></li>
-    <li class="nav-item"><a class="nav-link" href="#products"        data-section="products"><i class="bi bi-tag"></i>Loan Products</a></li>
-    <li class="nav-item"><a class="nav-link" href="#savingsproducts" data-section="savingsproducts"><i class="bi bi-piggy-bank"></i>Savings Products</a></li>
-    <li class="nav-item"><a class="nav-link" href="#commissions" data-section="commissions"><i class="bi bi-percent"></i>Commissions</a></li>
-    <li class="nav-item"><a class="nav-link" href="#customers"       data-section="customers"><i class="bi bi-people"></i>All Customers</a></li>
-    <li class="nav-item"><a class="nav-link" href="#loans"      data-section="loans"><i class="bi bi-cash-coin"></i>All Loans</a></li>
-    <li class="nav-item"><a class="nav-link" href="#withdrawals" data-section="withdrawals"><i class="bi bi-arrow-up-circle"></i>Withdrawals</a></li>
-    <li class="nav-item"><a class="nav-link" href="#compliance" data-section="compliance"><i class="bi bi-shield-exclamation"></i>Compliance</a></li>
-    <li class="nav-item"><a class="nav-link" href="#system"     data-section="system"><i class="bi bi-gear"></i>System</a></li>
+    <li class="nav-item"><a class="nav-link" href="#dashboard"      data-section="dashboard"      onclick="closeAdminSidebar()"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link" href="#users"          data-section="users"          onclick="closeAdminSidebar()"><i class="bi bi-person-badge"></i>Staff Users</a></li>
+    <li class="nav-item"><a class="nav-link" href="#products"       data-section="products"       onclick="closeAdminSidebar()"><i class="bi bi-tag"></i>Loan Products</a></li>
+    <li class="nav-item"><a class="nav-link" href="#savingsproducts" data-section="savingsproducts" onclick="closeAdminSidebar()"><i class="bi bi-piggy-bank"></i>Savings Products</a></li>
+    <li class="nav-item"><a class="nav-link" href="#commissions"    data-section="commissions"    onclick="closeAdminSidebar()"><i class="bi bi-percent"></i>Commissions</a></li>
+    <li class="nav-item"><a class="nav-link" href="#customers"      data-section="customers"      onclick="closeAdminSidebar()"><i class="bi bi-people"></i>All Customers</a></li>
+    <li class="nav-item"><a class="nav-link" href="#loans"          data-section="loans"          onclick="closeAdminSidebar()"><i class="bi bi-cash-coin"></i>All Loans</a></li>
+    <li class="nav-item"><a class="nav-link" href="#withdrawals"    data-section="withdrawals"    onclick="closeAdminSidebar()"><i class="bi bi-arrow-up-circle"></i>Withdrawals</a></li>
+    <li class="nav-item"><a class="nav-link" href="#compliance"     data-section="compliance"     onclick="closeAdminSidebar()"><i class="bi bi-shield-exclamation"></i>Compliance</a></li>
+    <li class="nav-item"><a class="nav-link" href="#system"         data-section="system"         onclick="closeAdminSidebar()"><i class="bi bi-gear"></i>System</a></li>
   </ul>
 
   <div class="sidebar-footer">
@@ -787,6 +811,18 @@
 'use strict';
 if (!requireAuth('staff')) throw new Error('not authenticated');
 if (!Auth.isAdmin()) { location.href = '/staff'; throw new Error('not admin'); }
+
+// ── Mobile sidebar toggle ─────────────────────────────────────────────────────
+function openAdminSidebar() {
+  document.getElementById('adminSidebar').classList.add('mobile-open');
+  document.getElementById('sidebarBackdrop').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeAdminSidebar() {
+  document.getElementById('adminSidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarBackdrop').style.display = 'none';
+  document.body.style.overflow = '';
+}
 
 const SECTIONS = ['dashboard','users','products','savingsproducts','commissions','customers','loans','withdrawals','compliance','system'];
 initNav(SECTIONS, 'dashboard', loadSection);

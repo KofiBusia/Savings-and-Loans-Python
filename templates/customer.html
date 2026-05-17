@@ -62,22 +62,26 @@
   <div class="offcanvas-body p-0">
     <ul class="nav flex-column py-2" id="mobileNavLinks">
       <li class="nav-item">
-        <a class="nav-link px-4 py-3" href="#dashboard" data-section="dashboard" data-bs-dismiss="offcanvas">
+        <a class="nav-link px-4 py-3" href="#dashboard" data-section="dashboard"
+           onclick="mobileNavGo('dashboard')">
           <i class="bi bi-speedometer2 me-2" style="color:var(--gold);"></i>Dashboard
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link px-4 py-3" href="#savings" data-section="savings" data-bs-dismiss="offcanvas">
+        <a class="nav-link px-4 py-3" href="#savings" data-section="savings"
+           onclick="mobileNavGo('savings')">
           <i class="bi bi-piggy-bank me-2" style="color:var(--gold);"></i>Savings
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link px-4 py-3" href="#loans" data-section="loans" data-bs-dismiss="offcanvas">
+        <a class="nav-link px-4 py-3" href="#loans" data-section="loans"
+           onclick="mobileNavGo('loans')">
           <i class="bi bi-cash-coin me-2" style="color:var(--gold);"></i>Loans
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link px-4 py-3" href="#profile" data-section="profile" data-bs-dismiss="offcanvas">
+        <a class="nav-link px-4 py-3" href="#profile" data-section="profile"
+           onclick="mobileNavGo('profile')">
           <i class="bi bi-person me-2" style="color:var(--gold);"></i>Profile
         </a>
       </li>
@@ -868,6 +872,21 @@ async function loadProfile() {
       </dl>`;
   } catch (err) {
     toast('Error loading profile: ' + err.message, 'danger');
+  }
+}
+
+// ── Mobile nav ───────────────────────────────────────────────────────────────
+function mobileNavGo(section) {
+  var ocEl = document.getElementById('mobileNav');
+  var oc = bootstrap.Offcanvas.getInstance(ocEl);
+  if (oc) {
+    ocEl.addEventListener('hidden.bs.offcanvas', function handler() {
+      ocEl.removeEventListener('hidden.bs.offcanvas', handler);
+      location.hash = '#' + section;
+    }, { once: true });
+    oc.hide();
+  } else {
+    location.hash = '#' + section;
   }
 }
 

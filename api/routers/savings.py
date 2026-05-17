@@ -162,11 +162,23 @@ def customer_initiate_deposit(
     db: Session = Depends(get_db),
     current_customer: models.Customer = Depends(get_current_customer),
 ):
-    account = db.query(models.SavingsAccount).filter_by(
-        customer_id=current_customer.id, status="ACTIVE"
-    ).first()
+    account = (
+        db.query(models.SavingsAccount)
+        .filter(
+            models.SavingsAccount.customer_id == current_customer.id,
+            models.SavingsAccount.status.in_(["ACTIVE", "PENDING_ACTIVATION"]),
+        )
+        .first()
+    )
     if not account:
-        raise HTTPException(status_code=404, detail="No active savings account found")
+        raise HTTPException(
+            status_code=404,
+            detail="No savings account found. Please visit a branch to open one.",
+        )
+    # Customer passed authentication — auto-activate if account still pending
+    if account.status == "PENDING_ACTIVATION":
+        account.status = "ACTIVE"
+        db.flush()
 
     reference = generate_reference()
 
