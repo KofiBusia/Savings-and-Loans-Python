@@ -157,7 +157,7 @@ def my_savings(
 
 @router.post("/my/deposit/initiate", response_model=DepositInitiateResponse,
              status_code=201, summary="Initiate a Paystack deposit (customer)")
-async def customer_initiate_deposit(
+def customer_initiate_deposit(
     body: DepositRequest,
     db: Session = Depends(get_db),
     current_customer: models.Customer = Depends(get_current_customer),

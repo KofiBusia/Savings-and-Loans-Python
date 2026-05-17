@@ -99,9 +99,11 @@ class LoanResponse(BaseModel):
     approved_at: datetime | None
     disbursed_at: datetime | None
     maturity_date: datetime | None
+    next_due_date: datetime | None
     amount_paid_ghs: Decimal
     outstanding_ghs: Decimal
     days_past_due: int
+    created_at: datetime
 
     model_config = {"from_attributes": True}
 

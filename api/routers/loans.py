@@ -292,6 +292,7 @@ def customer_apply_loan(
                 actor_id=customer.id,
                 data={"loan_number": loan.loan_number, "principal": str(body.principal_ghs),
                       "purpose": body.purpose, "collateral_value": str(body.collateral_value_ghs)})
+    db.commit()
     return loan
 
 
@@ -409,7 +410,7 @@ def apply_for_loan(
                     "loan_number": loan.loan_number, "principal": str(body.principal_ghs),
                     "customer_id": customer.id,
                 })
-
+    db.commit()
     return loan
 
 

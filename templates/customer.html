@@ -831,7 +831,9 @@ async function loadProfile() {
 function openDeposit() {
   document.getElementById('depErr').innerHTML = '';
   document.getElementById('depAmt').value = '';
-  new bootstrap.Modal('#depositModal').show();
+  document.getElementById('depNote').value = '';
+  const m = bootstrap.Modal.getOrCreateInstance('#depositModal');
+  m.show();
 }
 
 async function initiatePaystackDeposit(e) {
@@ -839,52 +841,98 @@ async function initiatePaystackDeposit(e) {
   const errEl = document.getElementById('depErr');
   const btn   = document.getElementById('depBtn');
   errEl.innerHTML = '';
+
+  const amount_ghs = parseFloat(document.getElementById('depAmt').value);
+  const narration  = document.getElementById('depNote').value || null;
+
+  if (!amount_ghs || amount_ghs <= 0) {
+    errEl.innerHTML = '<div class="alert alert-danger py-2">Please enter a valid amount.</div>';
+    return;
+  }
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Loading…';
 
+  let init;
   try {
-    const amount_ghs = parseFloat(document.getElementById('depAmt').value);
-    const narration  = document.getElementById('depNote').value || null;
-
-    // Step 1: get reference from our backend
-    const init = await api('POST', '/savings/my/deposit/initiate', { amount_ghs, narration });
-
-    // Step 2: close our modal and open Paystack popup
-    bootstrap.Modal.getInstance('#depositModal').hide();
-
-    const handler = PaystackPop.setup({
-      key:       init.public_key,
-      email:     init.email,
-      amount:    init.amount_pesewas,
-      currency:  'GHS',
-      ref:       init.reference,
-      label:     'Crestline S&L Deposit',
-      onClose: function() {
-        toast('Payment window closed. Your deposit will be confirmed if payment was completed.', 'warning');
-      },
-      callback: async function(response) {
-        // Payment successful on Paystack — verify with our backend
-        try {
-          const result = await api('GET', `/savings/my/deposit/verify/${response.reference}`);
-          if (result.status === 'CONFIRMED') {
-            toast(`Deposit of GHS ${amount_ghs.toFixed(2)} confirmed!`);
-            await loadDashboard();
-            await loadSavings();
-          } else {
-            toast('Payment received — pending confirmation. Refresh in a moment.', 'warning');
-          }
-        } catch {
-          toast('Payment received. Balance will update shortly.', 'warning');
-        }
-      },
-    });
-    handler.openIframe();
-
+    init = await api('POST', '/savings/my/deposit/initiate', { amount_ghs, narration });
   } catch (err) {
-    errEl.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
-  } finally {
+    errEl.innerHTML = `<div class="alert alert-danger py-2">${err.message}</div>`;
     btn.disabled = false;
     btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
+    return;
+  }
+
+  // Hide the deposit modal, then open Paystack popup after it fully closes
+  const modalEl = document.getElementById('depositModal');
+  const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  function _launchPaystack() {
+    if (typeof PaystackPop === 'undefined') {
+      toast('Paystack is not available. Please check your internet connection and try again.', 'danger');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
+      return;
+    }
+
+    PaystackPop.setup({
+      key:      init.public_key,
+      email:    init.email,
+      amount:   init.amount_pesewas,   // pesewas
+      currency: 'GHS',
+      ref:      init.reference,
+      label:    'Crestline S&L Deposit',
+      onClose: function() {
+        // User closed popup — try a delayed verify in case payment completed
+        toast('Payment window closed. Checking status…', 'warning');
+        setTimeout(function() {
+          fetch(BASE + '/savings/my/deposit/verify/' + init.reference, {
+            headers: { Authorization: 'Bearer ' + Auth.getToken() }
+          })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.status === 'CONFIRMED') {
+              toast('Deposit of GHS ' + amount_ghs.toFixed(2) + ' confirmed!', 'success');
+              loadDashboard();
+              loadSavings();
+            }
+          })
+          .catch(function() {});
+        }, 2000);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
+      },
+      callback: function(response) {
+        // Paystack signals success — verify on our backend
+        toast('Payment received — confirming deposit…', 'info');
+        fetch(BASE + '/savings/my/deposit/verify/' + response.reference, {
+          headers: { Authorization: 'Bearer ' + Auth.getToken() }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.status === 'CONFIRMED') {
+            toast('GHS ' + amount_ghs.toFixed(2) + ' deposit confirmed! Balance updated.', 'success');
+          } else {
+            toast('Payment received — balance will update in a moment.', 'warning');
+          }
+          loadDashboard();
+          loadSavings();
+        })
+        .catch(function() {
+          toast('Payment received. Your balance will be updated shortly.', 'warning');
+        });
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-credit-card me-1"></i>Pay with Paystack';
+      }
+    }).openIframe();
+  }
+
+  // Wait for Bootstrap modal to fully hide before launching Paystack iframe
+  if (modalEl.classList.contains('show')) {
+    modalEl.addEventListener('hidden.bs.modal', _launchPaystack, { once: true });
+    bsModal.hide();
+  } else {
+    _launchPaystack();
   }
 }
 
