@@ -24,7 +24,8 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy import JSON as _JSON
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from api.database import Base
@@ -51,7 +52,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     full_name = Column(String(255))
     phone = Column(String(20))
-    roles = Column(ARRAY(String), nullable=False, default=list)
+    roles = Column(_JSON, nullable=False, default=list)
     # Roles: SUPER_ADMIN, ADMIN, FIELD_OFFICER, CREDIT_MANAGER,
     #        COMPLIANCE_OFFICER, TELLER, AUDIT_VIEWER
 
@@ -296,7 +297,7 @@ class LoanProduct(Base):
 
     requires_collateral = Column(Boolean, default=False, nullable=False)
     requires_guarantor = Column(Boolean, default=False, nullable=False)
-    eligible_customer_types = Column(ARRAY(String), nullable=False, default=list)
+    eligible_customer_types = Column(_JSON, nullable=False, default=list)
     minimum_kyc_status = Column(String(40), nullable=False, default="ACTIVE")
 
     is_active = Column(Boolean, default=True, nullable=False)
@@ -563,10 +564,10 @@ class SanctionsList(Base):
     # UN_CONSOLIDATED | OFAC_SDN | EU_CONSOLIDATED | BOG_PEP | LOCAL_BLACKLIST
 
     full_name = Column(String(500), nullable=False, index=True)
-    aliases = Column(ARRAY(String))
+    aliases = Column(_JSON)
     date_of_birth = Column(String(20))
     nationality = Column(String(100))
-    id_numbers = Column(ARRAY(String))
+    id_numbers = Column(_JSON)
     designation = Column(Text)
     listed_on = Column(DateTime(timezone=True))
     delisted_on = Column(DateTime(timezone=True))

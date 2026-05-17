@@ -28,12 +28,13 @@ engine = create_engine(
     echo=settings.node_env == "development",
 )
 
-# Enforce UTC timestamps at the connection level
-@event.listens_for(engine, "connect")
-def set_utc_timezone(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("SET TIME ZONE 'UTC'")
-    cursor.close()
+# Enforce UTC timestamps at the connection level (PostgreSQL only)
+if settings.database_url.startswith("postgresql"):
+    @event.listens_for(engine, "connect")
+    def set_utc_timezone(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("SET TIME ZONE 'UTC'")
+        cursor.close()
 
 
 SessionLocal: sessionmaker[Session] = sessionmaker(
